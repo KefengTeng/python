@@ -24,8 +24,8 @@ for sheet in wbr.get_sheet_names():
             # 去掉单元格中内容前后存在的空格或换行符
             nrow = tuple(map(lambda s: str(s).strip(), row))
             # 处理后的数据,每5条记录保存为一行
-            irow.append('工程名称1:%s\n设备型号:%s\n设备名:%s\n设备用途:%s\n设备所属节点:%s\n设备IP地址:%s\n设备序列号:%s' \
-                  % tuple(nrow[i] for i in range(1, len(nrow))))
+            irow.append('工程名称1:%s\n设备型号:%s\n设备名:%s\n设备用途:%s\n设备所属节点:%s\n设备IP地址:%s\n设备序列号:%s'
+                        % tuple(nrow[i] for i in range(1, len(nrow))))
             if len(irow) == 5:
                 cur_sheet.append(irow)
                 irow = []

@@ -42,7 +42,6 @@ def ConfigSR():
         time.sleep(1)
         print(channel.recv(1024).decode('utf-8'))
 
-
         for port in dev_Port:
 
             # Send data to the channel
@@ -92,6 +91,7 @@ def ConfigSR():
 
         # Close this SSHClient and its underlying Transport.
         client.close()
+
 
 if __name__ == '__main__':
     ConfigSR()

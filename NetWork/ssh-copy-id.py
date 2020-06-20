@@ -3,7 +3,12 @@
 
 # Author: brokensmile@yeah.net
 # Copy the public key of master host to the other hosts automaticaly, the master host need to install nmap
-import os, re, time, getpass, logging, paramiko
+import os
+import re
+import time
+import getpass
+import logging
+import paramiko
 
 # 输入主机登录用户名
 while True:
@@ -56,7 +61,7 @@ if not os.path.isfile("%s/.ssh/id_rsa.pub" % home):
 else:
     logging.warning('主机公钥已存在, 准备拷贝公钥至其他主机...\n')
 
-with open("%s/.ssh/id_rsa.pub" %home) as kf:
+with open("%s/.ssh/id_rsa.pub" % home) as kf:
     pub_key = kf.readlines()[0]
 
 # 调用shell命令扫描SSH默认端口开放主机, 并将结果写入文件
@@ -79,11 +84,13 @@ with open('hosts.txt', 'r') as f:
                 ssh_client = paramiko.SSHClient()
 
                 # Set policy to use when connecting to servers without a known host key
-                ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                ssh_client.set_missing_host_key_policy(
+                    paramiko.AutoAddPolicy())
 
                 # Connect to an SSH server and authenticate to it
                 logging.warning('尝试登录主机: %s ...\n' % dst_ip)
-                ssh_client.connect(hostname=dst_ip, username=user_name, password=user_pass)
+                ssh_client.connect(
+                    hostname=dst_ip, username=user_name, password=user_pass)
                 logging.warning('登录主机成功: %s ...\n' % dst_ip)
 
                 # 创建.ssh目录
@@ -93,7 +100,8 @@ with open('hosts.txt', 'r') as f:
                 exec_cmd("chmod 700 %s/.ssh/" % home)
 
                 # 追加写入authorized_keys
-                exec_cmd("echo '%s' >> %s/.ssh/authorized_keys" % (pub_key, home))
+                exec_cmd("echo '%s' >> %s/.ssh/authorized_keys" %
+                         (pub_key, home))
 
                 # 修改authorized_keys权限
                 exec_cmd("chmod 600 %s/.ssh/authorized_keys" % home)

@@ -4,7 +4,9 @@
 # Author: brokensmile@yeah.net
 # Make configurations to the disconnected FTTB devices through OLT.
 
-import logging, re, time
+import logging
+import re
+import time
 from telnetlib import Telnet
 
 # 设备字典 Key: OltIp, Value: FttbIp
@@ -16,7 +18,8 @@ with open('devices.txt', 'r') as f:
             ConfigDev.setdefault(IpList[0], []).append(IpList[1])
 
 # 遍历字典登录OLT设备查询默认网关, 对FTTB设备做Ping测试, 能Ping通则登录设备下发相关配置
-(OltUserName, OltPassWord, FttbUserName, FttbPassWord) = ('xxxx', 'xxxx', 'xxxx', 'xxxx')
+(OltUserName, OltPassWord, FttbUserName, FttbPassWord) = (
+    'xxxx', 'xxxx', 'xxxx', 'xxxx')
 
 
 class TelnetClient():
@@ -60,7 +63,8 @@ class TelnetClient():
         time.sleep(2)
         cmd_result = self.tn.read_very_eager().decode('ascii')
         if re.search(r'RD\s+(\d+.\d+.\d+.\d+)', cmd_result, re.M):
-            GateWay = re.search(r'RD\s+(\d+.\d+.\d+.\d+)', cmd_result, re.M).group(1)
+            GateWay = re.search(r'RD\s+(\d+.\d+.\d+.\d+)',
+                                cmd_result, re.M).group(1)
             logging.warning('[默认网关]: %s' % GateWay)
         DealCount = 0
 
@@ -116,45 +120,52 @@ class TelnetClient():
                     time.sleep(1)
 
                     # 静态路由配置
-                    self.tn.write(b'display current-configuration section post-system\n')
+                    self.tn.write(
+                        b'display current-configuration section post-system\n')
                     self.tn.write(b'\n')
                     time.sleep(2)
                     cmd_result = self.tn.read_very_eager().decode('ascii')
                     logging.warning('[路由初始配置]: ...\n' + cmd_result)
                     if not re.search(r'ip\s+route-static\s+10.41.81.64\s+255.255.255.224\s+%s' % GateWay, cmd_result,
                                      re.M):
-                        self.tn.write(b'ip route-static 10.41.81.64 255.255.255.224 ' + GateWay.encode('ascii') + b'\n')
+                        self.tn.write(
+                            b'ip route-static 10.41.81.64 255.255.255.224 ' + GateWay.encode('ascii') + b'\n')
                         self.tn.write(b'\n')
                         time.sleep(1)
                         logging.warning('[路由①]: 配置成功...')
                     else:
                         logging.warning('[路由①]: 配置已存在...')
                     if not re.search(r'ip\s+route-static\s+10.40.0.0\s+255.248.0.0\s+%s' % GateWay, cmd_result, re.M):
-                        self.tn.write(b"ip route-static 10.40.0.0 255.248.0.0 " + GateWay.encode('ascii') + b'\n')
+                        self.tn.write(
+                            b"ip route-static 10.40.0.0 255.248.0.0 " + GateWay.encode('ascii') + b'\n')
                         self.tn.write(b'\n')
                         time.sleep(1)
                         logging.warning('[路由②]: 配置成功...')
                     else:
                         logging.warning('[路由②]: 配置已存在...')
                     if not re.search(r'ip\s+route-static\s+10.48.0.0\s+255.254.0.0\s+%s' % GateWay, cmd_result, re.M):
-                        self.tn.write(b'ip route-static 10.48.0.0 255.254.0.0 ' + GateWay.encode('ascii') + b'\n')
+                        self.tn.write(
+                            b'ip route-static 10.48.0.0 255.254.0.0 ' + GateWay.encode('ascii') + b'\n')
                         self.tn.write(b'\n')
                         time.sleep(1)
                         logging.warning('[路由③]: 配置成功...')
                     else:
                         logging.warning('[路由③]: 配置已存在...')
                     if not re.search(r'ip\s+route-static\s+10.0.0.0\s+255.240.0.0\s+%s' % GateWay, cmd_result, re.M):
-                        self.tn.write(b'ip route-static 10.0.0.0 255.240.0.0 ' + GateWay.encode('ascii') + b'\n')
+                        self.tn.write(
+                            b'ip route-static 10.0.0.0 255.240.0.0 ' + GateWay.encode('ascii') + b'\n')
                         self.tn.write(b'\n')
                         time.sleep(1)
                         logging.warning('[路由④]: 配置成功...')
                     else:
                         logging.warning('[路由④]: 配置已存在...')
 
-                    self.tn.write(b'display current-configuration section post-system\n')
+                    self.tn.write(
+                        b'display current-configuration section post-system\n')
                     self.tn.write(b'\n')
                     time.sleep(2)
-                    logging.warning('[路由变更后或者初始配置]: ...\n' + self.tn.read_very_eager().decode('ascii'))
+                    logging.warning('[路由变更后或者初始配置]: ...\n' +
+                                    self.tn.read_very_eager().decode('ascii'))
 
                     # snmp-agent配置
                     self.tn.write(
@@ -202,7 +213,8 @@ class TelnetClient():
                 logging.warning('[%s]: Ping不通, 忽略配置下发...\n' % Fttb)
 
             DealCount += 1
-            logging.warning('[当前OLT下待处理FTTB设备总数/已处理数]: %d/%d...\n' % (len(Fttb_Ip), DealCount))
+            logging.warning('[当前OLT下待处理FTTB设备总数/已处理数]: %d/%d...\n' %
+                            (len(Fttb_Ip), DealCount))
 
         self.logout_dev()
 
@@ -210,6 +222,7 @@ class TelnetClient():
     def logout_dev(self):
         self.tn.write(b'quit\n')
         self.tn.write(b'y\n')
+
 
 for key, value in ConfigDev.items():
     Telnet_Client = TelnetClient()

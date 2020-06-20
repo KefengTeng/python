@@ -1,7 +1,9 @@
 #!/bin/env python3
 # -*- coding: utf-8 -*-
 
-import time, socket, threading
+import time
+import socket
+import threading
 
 # 创建一个基于IPv4和TCP协议的Socket
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -10,6 +12,7 @@ s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind(('127.0.0.1', 9999))
 s.listen(5)
 print('Waiting for connection...')
+
 
 def tcplink(sock, addr):
     print('Accept new connection from %s:%s...' % addr)
@@ -23,13 +26,10 @@ def tcplink(sock, addr):
     sock.close()
     print('Connection from %s:%s closed.' % addr)
 
+
 while True:
     # 接受一个新连接
     sock, addr = s.accept()
     # 创建新现存来处理TCP连接
     t = threading.Thread(target=tcplink, args=(sock, addr))
     t.start()
-
-
-
-

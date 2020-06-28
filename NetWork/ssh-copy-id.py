@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # Author: brokensmile@yeah.net
-# Copy the public key of master host to the other hosts automaticaly, the master host need to install nmap
+# Copy the ssh public key of master host to the other hosts automaticaly, the master host need to install nmap
 import os
 import re
 import time
@@ -94,19 +94,19 @@ with open('hosts.txt', 'r') as f:
                 logging.warning('登录主机成功: %s ...\n' % dst_ip)
 
                 # 创建.ssh目录
-                exec_cmd("test -d %s/.ssh || mkdir -p %s/.ssh/" % home)
+                exec_cmd("test -d %s/.ssh || mkdir -p %s/.ssh/" % (home, home))
 
                 # 修改.ssh目录权限
                 exec_cmd("chmod 700 %s/.ssh/" % home)
 
                 # 追加写入authorized_keys
-                exec_cmd("echo '%s' >> %s/.ssh/authorized_keys" %
+                exec_cmd("echo -n '%s' >> %s/.ssh/authorized_keys" %
                          (pub_key, home))
 
                 # 修改authorized_keys权限
                 exec_cmd("chmod 600 %s/.ssh/authorized_keys" % home)
 
-            except:
+            except paramiko.AuthenticationException:
                 logging.warning('登录主机失败...\n')
 
             finally:

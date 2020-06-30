@@ -52,7 +52,7 @@ try:
     for line in Route_Result.split('\n'):
         if Route_Regex.search(line):
             Del_Net, Del_Mask = Route_Regex.search(line).groups()
-            if re.search(r'192\.168\.6', Del_Net):
+            if re.search(r'192\.168\.6\.', Del_Net):
                 print("[ºöÂÔ¹«Ë¾ÄÚÍøÍø¶Î]:\t%s %s\n" % (Del_Net, Del_Mask))
             else:
                 print("[¼´½«É¾³ıÍø¶Î]:\t%s %s\n" % (Del_Net, Del_Mask))
@@ -61,9 +61,6 @@ try:
     Personal_Network_List = Personal_Network_Sum.split(';')
     for Personal_Network in Personal_Network_List:
         CustNet, CustMask = Personal_Network.split('/')
-        # if CustMask == 32:
-        #    CustBinMask = "255.255.255.255"
-        #CustBinMask = "255." * int(int(CustMask) // 8) + str(int(256 - 256 / 2**(int(CustMask) % 8)))
         CustBinMask = exchange_maskint(CustMask)
         print("[¼´½«Ìí¼ÓÍø¶Î]:\t%s %s\n" % (CustNet, CustBinMask))
         print(os.popen("route ADD %s MASK %s %s METRIC 256 IF %s" %

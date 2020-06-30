@@ -1,2 +1,3 @@
-NetWork\\build
-NetWork\\dist
+.NetWork/build
+.NetWork/dist
+.NetWork/__pycache__

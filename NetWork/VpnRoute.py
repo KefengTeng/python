@@ -57,15 +57,11 @@ try:
             Del_Net, Del_Mask = Route_Regex.search(line).groups()
             print("[即将删除网段]:\t%s %s\n" % (Del_Net, Del_Mask))
             print(os.popen("route DELETE %s" % Del_Net).read())
-
-    print("[即将添加公司内部网段]:\t192.168.5.0 255.255.255.0\n")
-    print(os.popen("route ADD 192.168.5.0 MASK 255.255.255.0 %s METRIC 256 IF %s" % (GateWay, InterFace)).read())
-    print("[即将添加公司内部网段]:\t192.168.6.0 255.255.255.0\n")
-    print(os.popen("route ADD 192.168.6.0 MASK 255.255.255.0 %s METRIC 256 IF %s" % (GateWay, InterFace)).read())
-    print("[即将添加公司内部网段]:\t192.168.15.0 255.255.255.0\n")
-    print(os.popen("route ADD 192.168.15.0 MASK 255.255.255.0 %s METRIC 256 IF %s" % (GateWay, InterFace)).read())
-    print("[即将添加公司内部网段]:\t192.168.130.0 255.255.255.0\n")
-    print(os.popen("route ADD 192.168.130.0 MASK 255.255.255.0 %s METRIC 256 IF %s" % (GateWay, InterFace)).read())
+    Company_Net = ['192.168.5.0', '192.168.6.0', '192.168.130.0']
+    for Private_Net in Company_Net:
+        print("[即将添加公司内部网段]:\t%s 255.255.255.0\n" % Private_Net)
+        print(os.popen("route ADD %s MASK 255.255.255.0 %s METRIC 256 IF %s" %
+                       (Private_Net, GateWay, InterFace)).read())
 
     Personal_Network_List = Personal_Network_Sum.split(';')
     for Personal_Network in Personal_Network_List:

@@ -2,6 +2,8 @@
 
 import os
 import re
+import sys
+import time
 
 # 判断网段格式是否符合要求
 Network_Regex = re.compile(r'^(\d+)\.(\d+)\.(\d+)\.(\d+)/(\d+)$')
@@ -67,4 +69,10 @@ try:
         print(os.popen("route ADD %s MASK %s %s METRIC 256 IF %s" %
                        (CustNet, CustBinMask, GateWay, InterFace)).read())
 except AttributeError:
-    print('VPN路由表已清空, 无法获取默认网关，请重连VPN之后再次运行该程序...\n')
+    print('VPN路由表已清空, 无法获取默认网关，请重连VPN之后再次运行该程序...\n程序将在10s后退出...\n')
+finally:
+    print('程序将在10s后退出...\n')
+    for i in range(20):
+        time.sleep(0.5)
+        sys.stdout.write('#')
+        sys.stdout.flush()

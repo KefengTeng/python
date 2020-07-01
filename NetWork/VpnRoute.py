@@ -10,13 +10,14 @@ while Flag:
     Personal_Network_Sum = input(
         "[请输入自定义网段,多段地址以分号分隔]: 例 (114.114.114.114/32;114.114.115.115/32)\n")
     Personal_Network_List = Personal_Network_Sum.split(';')
+    Flag = len(Personal_Network_List)
     for Personal_Network in Personal_Network_List:
         if Network_Regex.search(Personal_Network):
             Bin1, Bin2, Bin3, Bin4, Mask = Network_Regex.search(
                 Personal_Network).groups()
             if int(Bin1) != 127 and 0 <= int(Bin1) <= 255 and 0 <= int(Bin2) <= 255 and 0 <= int(Bin3) <= 255 and 0 <= int(Bin4) <= 255 and 1 <= int(Mask) <= 32:
                 print("[您输入的网段为]:\t%s\n" % Personal_Network)
-                Flag = 0
+                Flag -= 1
             else:
                 print("您输入的网段错误, 请重新输入...\n")
         else:

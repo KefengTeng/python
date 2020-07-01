@@ -1,4 +1,4 @@
-.NetWork/build
-.NetWork/dist
-.NetWork/__pycache__
-.NetWork/VpnRoute.spec
+NetWork/build/
+NetWork/dist/
+NetWork/__pycache__/
+NetWork/VpnRoute.spec

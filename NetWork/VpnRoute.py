@@ -14,7 +14,7 @@ while Flag:
         if Network_Regex.search(Personal_Network):
             Bin1, Bin2, Bin3, Bin4, Mask = Network_Regex.search(
                 Personal_Network).groups()
-            if int(Bin1) != 127 and 0 < int(Bin1) < 255 and 0 < int(Bin2) < 255 and 0 < int(Bin3) < 255 and 0 < int(Bin4) < 255 and 1 <= int(Mask) <= 32:
+            if int(Bin1) != 127 and 0 <= int(Bin1) <= 255 and 0 <= int(Bin2) <= 255 and 0 <= int(Bin3) <= 255 and 0 <= int(Bin4) <= 255 and 1 <= int(Mask) <= 32:
                 print("[ÄúÊäÈëµÄÍø¶ÎÎª]:\t%s\n" % Personal_Network)
                 Flag = 0
             else:

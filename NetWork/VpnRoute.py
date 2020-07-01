@@ -55,17 +55,17 @@ try:
     for line in Route_Result.split('\n'):
         if Route_Regex.search(line):
             Del_Net, Del_Mask = Route_Regex.search(line).groups()
-            if re.search(r'192\.168\.4\.', Del_Net):
-                print("[忽略公司内网网段]:\t%s %s\n" % (Del_Net, Del_Mask))
-            else:
-                print("[即将删除网段]:\t%s %s\n" % (Del_Net, Del_Mask))
-                print(os.popen("route DELETE %s" % Del_Net).read())
+            print("[即将删除网段]:\t%s %s\n" % (Del_Net, Del_Mask))
+            print(os.popen("route DELETE %s" % Del_Net).read())
+
+    print("[即将添加公司内部网段]:\t192.168.6.0 255.255.255.0\n")
+    print(os.popen("route ADD 192.168.6.0 MASK 255.255.255.0 %s METRIC 256 IF %s" % (GateWay, InterFace)).read())
 
     Personal_Network_List = Personal_Network_Sum.split(';')
     for Personal_Network in Personal_Network_List:
         CustNet, CustMask = Personal_Network.split('/')
         CustBinMask = exchange_maskint(CustMask)
-        print("[即将添加网段]:\t%s %s\n" % (CustNet, CustBinMask))
+        print("[即将添加自定义网段]:\t%s %s\n" % (CustNet, CustBinMask))
         print(os.popen("route ADD %s MASK %s %s METRIC 256 IF %s" %
                        (CustNet, CustBinMask, GateWay, InterFace)).read())
 except AttributeError:

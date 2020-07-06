@@ -1,7 +1,6 @@
 ---
 - name: Copy files to target hosts and update openssh
   hosts: all
-  vars:
 
   tasks:
   - name: Modify telnet-server config file to enable telnet-server

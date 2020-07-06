@@ -36,7 +36,6 @@
       - echo "/usr/local/openssl/lib" >/etc/ld.so.conf.d/openssl.conf && ldconfig
       - find / -type l -name libssl.\* -exec bash -c "ls {}|grep -v local|grep -v "so.4" >>libssl.txt" \;
       - find / -type l -name libcrypto.\* -exec bash -c "ls {}|grep -v local|grep -v "so.4" >>libcrypto.txt" \;
-      - ldconfig
 
   - name: Make install openssh
     shell: "{{ item }}"

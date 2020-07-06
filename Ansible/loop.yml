@@ -1,0 +1,32 @@
+---
+- name: Loop
+  hosts: localhost
+
+  vars:
+    test:
+    - test1
+    - test2
+    - test3
+    - test4
+    demo:
+    - demo1
+    - demo2
+    - demo3
+    xyz:
+    - xyz1
+    - xyz2
+    - xyz3
+
+  tasks:
+    - name: single loop
+      debug:
+        msg: "{{ item }}"
+      with_items: "{{ test }}"
+
+    - name: nested loop
+      debug:
+        msg: "{{ item[0] }}, {{ item[1] }}, {{ item[2] }}"
+      with_nested:
+        - "{{ test }}"
+        - "{{ demo }}"
+        - "{{ xyz }}"

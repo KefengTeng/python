@@ -27,7 +27,7 @@ while Flag:
 
 # 查找本机IP
 Ip_Result = os.popen("ipconfig").read()
-Ip = re.search(r'(2\.0\.1\.\d+)', Ip_Result, re.M).group(1)
+Ip = re.search(r'(192\.168\.251\.\d+)', Ip_Result, re.M).group(1)
 print("[本机IP]:\t%s\n" % Ip)
 
 

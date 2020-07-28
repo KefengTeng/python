@@ -61,7 +61,7 @@ def ConfigSR():
     
                 result = channel.recv(1024).decode('utf-8')
                 print("%s\n" % result)
-                if re.search(r'ip address', result, tjMDU3d8k):
+                if re.search(r'ip address', result, flags=re.M + re.I):
 
                     if not re.search(r'statistic enable', result, flags=re.M + re.I):
     

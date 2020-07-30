@@ -11,9 +11,11 @@ client = paramiko.SSHClient()
 # Set policy to use when connecting to servers without a known host key
 client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
+
 def ConfigSR():
 
-    # Create an empty dictionary, use the ip as key, append the port into a list as value
+    # Create an empty dictionary, use the ip as key, append the port into a
+    # list as value
     dev_dict = {}
 
     with open('dev.txt') as f:

@@ -21,9 +21,10 @@ def ConfigSR():
             dev_dict.setdefault(line.split()[0], []).append(line.split()[1])
 
     for dev_Ip, dev_Port in dev_dict.items():
-        
+
         # Connect to an SSH server and authenticate to it
-        client.connect(hostname=dev_Ip, username='xxxx', password='xxxx', timeout=30)
+        client.connect(hostname=dev_Ip, username='xxxx',
+                       password='xxxx', timeout=30)
 
         # Start an interactive shell session on the SSH server
         channel = client.invoke_shell()
@@ -32,7 +33,7 @@ def ConfigSR():
         # Send data to the channel
         channel.send("\n")
         time.sleep(1)
- 
+
         # Determine which kind of device it is
         prompt = channel.recv(1024).decode('utf-8')
 
@@ -42,10 +43,10 @@ def ConfigSR():
             # Send data to the channel
             channel.send("screen-length 0 temporary\n")
             time.sleep(1)
-    
+
             # Receive data from the channel
             print(channel.recv(1024).decode('utf-8'))
-    
+
             # Send data to the channel
             channel.send("system-view\n")
             time.sleep(1)
@@ -56,33 +57,34 @@ def ConfigSR():
             for port in dev_Port:
 
                 # Determine whether this port has configuration
-                channel.send("display current-configuration interface {}\n".format(port))
+                channel.send(
+                    "display current-configuration interface {}\n".format(port))
                 time.sleep(1)
-    
+
                 result = channel.recv(1024).decode('utf-8')
                 print("%s\n" % result)
                 if re.search(r'ip address', result, flags=re.M + re.I):
 
                     if not re.search(r'statistic enable', result, flags=re.M + re.I):
-    
+
                         # Send data to the channel
                         channel.send("interface {}\n".format(port))
                         time.sleep(1)
-        
+
                         # Receive data from the channel
                         print(channel.recv(1024).decode('utf-8'))
-        
+
                         # Send data to the channel
                         channel.send("statistic enable\n")
                         time.sleep(1)
-        
+
                         # Receive data from the channel
                         print(channel.recv(1024).decode('utf-8'))
-        
+
                         # Send data to the channel
                         channel.send("quit\n".format(port))
                         time.sleep(1)
-        
+
                         # Receive data from the channel
                         print(channel.recv(1024).decode('utf-8'))
 
@@ -103,7 +105,7 @@ def ConfigSR():
             # Receive data from the channel
             print(channel.recv(1024).decode('utf-8'))
 
-            ## Send data to the channel
+            # Send data to the channel
             channel.send("y\n")
             time.sleep(1)
 
@@ -112,7 +114,7 @@ def ConfigSR():
 
         # ZTE
         elif prompt.endswith('#'):
-        
+
             # Send data to the channel
             channel.send("terminal length 0\n")
             time.sleep(1)
@@ -126,13 +128,13 @@ def ConfigSR():
 
             # Receive data from the channel
             print(channel.recv(1024).decode('utf-8'))
-    
+
             for port in dev_Port:
-    
+
                 # Determine whether this port has configuration
                 channel.send("show running-config-interface {}\n".format(port))
                 time.sleep(1)
-    
+
                 result = channel.recv(1024).decode('utf-8')
                 print("%s\n" % result)
                 if re.search(r'ip address', result, flags=re.M + re.I):
@@ -143,34 +145,34 @@ def ConfigSR():
                         channel.send("intf-statistics\n".format(port))
                         time.sleep(1)
                         # Receive data from the channel
-                        
+
                         print(channel.recv(1024).decode('utf-8'))
-        
+
                         # Send data to the channel
                         channel.send("interface {}\n".format(port))
                         time.sleep(1)
                         # Receive data from the channel
-                        
+
                         print(channel.recv(1024).decode('utf-8'))
-        
+
                         # Send data to the channel
                         channel.send("traffic-statistics enable\n")
                         time.sleep(1)
-        
-                        # Receive data from the channel
-                        print(channel.recv(1024).decode('utf-8'))
-        
-                        # Send data to the channel
-                        channel.send("exit\n".format(port))
-                        time.sleep(1)
-            
+
                         # Receive data from the channel
                         print(channel.recv(1024).decode('utf-8'))
 
                         # Send data to the channel
                         channel.send("exit\n".format(port))
                         time.sleep(1)
-            
+
+                        # Receive data from the channel
+                        print(channel.recv(1024).decode('utf-8'))
+
+                        # Send data to the channel
+                        channel.send("exit\n".format(port))
+                        time.sleep(1)
+
                         # Receive data from the channel
                         print(channel.recv(1024).decode('utf-8'))
 
@@ -180,23 +182,23 @@ def ConfigSR():
             # Send data to the channel
             channel.send("end\n")
             time.sleep(1)
-    
+
             # Receive data from the channel
             print(channel.recv(1024).decode('utf-8'))
-    
+
             # Send data to the channel
             channel.send("write\n")
             time.sleep(1)
-    
+
             # Receive data from the channel
             print(channel.recv(1024).decode('utf-8'))
-    
+
         # Close the channel
         channel.close()
 
         # Close this SSHClient and its underlying Transport.
         client.close()
 
+
 if __name__ == '__main__':
     ConfigSR()
-

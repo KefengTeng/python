@@ -65,7 +65,45 @@ def ConfigSR():
 
                 result = channel.recv(1024).decode('utf-8')
                 print("%s\n" % result)
-                if re.search(r'ip address', result, flags=re.M + re.I):
+                if re.search(r'Wrong parameter', result, flags=re.M + re.I):
+                    lport = port + '0000'
+                    # Determine whether this port has configuration
+                    channel.send(
+                        "display current-configuration interface {}\n".format(lport))
+                    time.sleep(1)
+
+                    result = channel.recv(1024).decode('utf-8')
+                    print("%s\n" % result)
+                    if re.search(r'Wrong parameter', result, flags=re.M + re.I):
+                        print("%s\t%s,%s\t主、备选端口均不存在\n" %
+                              (dev_Ip, port, lport))
+                    elif re.search(r'ip address', result, flags=re.M + re.I):
+                        if not re.search(r'statistic enable', result, flags=re.M + re.I):
+
+                            # Send data to the channel
+                            channel.send("interface {}\n".format(port))
+                            time.sleep(1)
+
+                            # Receive data from the channel
+                            print(channel.recv(1024).decode('utf-8'))
+
+                            # Send data to the channel
+                            channel.send("statistic enable\n")
+                            time.sleep(1)
+
+                            # Receive data from the channel
+                            print(channel.recv(1024).decode('utf-8'))
+
+                            # Send data to the channel
+                            channel.send("quit\n".format(port))
+                            time.sleep(1)
+
+                            # Receive data from the channel
+                            print(channel.recv(1024).decode('utf-8'))
+                    else:
+                        print("%s\t%s\t备选端口存在, 业务不存在\n" % (dev_Ip, lport))
+
+                elif re.search(r'ip address', result, flags=re.M + re.I):
 
                     if not re.search(r'statistic enable', result, flags=re.M + re.I):
 
@@ -91,7 +129,7 @@ def ConfigSR():
                         print(channel.recv(1024).decode('utf-8'))
 
                 else:
-                    print("%s\t%s\t没有业务信息\n" % (dev_Ip, port))
+                    print("%s\t%s\t主选端口存在, 业务不存在\n" % (dev_Ip, port))
 
             # Send data to the channel
             channel.send("return\n")
@@ -139,7 +177,60 @@ def ConfigSR():
 
                 result = channel.recv(1024).decode('utf-8')
                 print("%s\n" % result)
-                if re.search(r'ip address', result, flags=re.M + re.I):
+                if not re.search(r'if-intf', result, flags=re.M + re.I):
+                    lport = port + '0000'
+                    # Determine whether this port has configuration
+                    channel.send(
+                        "show running-config-interface {}\n".format(lport))
+                    time.sleep(1)
+
+                    result = channel.recv(1024).decode('utf-8')
+                    print("%s\n" % result)
+                    if not re.search(r'if-intf', result, flags=re.M + re.I):
+                        print("%s\t%s,%s\t主、备选端口均不存在\n" %
+                              (dev_Ip, port, lport))
+                    elif re.search(r'ip address', result, flags=re.M + re.I):
+
+                        if not re.search(r'traffic-statistics enable', result, flags=re.M + re.I):
+
+                            # Send data to the channel
+                            channel.send("intf-statistics\n".format(port))
+                            time.sleep(1)
+                            # Receive data from the channel
+
+                            print(channel.recv(1024).decode('utf-8'))
+
+                            # Send data to the channel
+                            channel.send("interface {}\n".format(port))
+                            time.sleep(1)
+                            # Receive data from the channel
+
+                            print(channel.recv(1024).decode('utf-8'))
+
+                            # Send data to the channel
+                            channel.send("traffic-statistics enable\n")
+                            time.sleep(1)
+
+                            # Receive data from the channel
+                            print(channel.recv(1024).decode('utf-8'))
+
+                            # Send data to the channel
+                            channel.send("exit\n".format(port))
+                            time.sleep(1)
+
+                            # Receive data from the channel
+                            print(channel.recv(1024).decode('utf-8'))
+
+                            # Send data to the channel
+                            channel.send("exit\n".format(port))
+                            time.sleep(1)
+
+                            # Receive data from the channel
+                            print(channel.recv(1024).decode('utf-8'))
+                    else:
+                        print("%s\t%s\t备选端口存在, 业务不存在\n" % (dev_Ip, lport))
+
+                elif re.search(r'ip address', result, flags=re.M + re.I):
 
                     if not re.search(r'traffic-statistics enable', result, flags=re.M + re.I):
 
@@ -179,7 +270,7 @@ def ConfigSR():
                         print(channel.recv(1024).decode('utf-8'))
 
                 else:
-                    print("%s\t%s\t没有业务信息\n" % (dev_Ip, port))
+                    print("%s\t%s\t主选端口存在, 业务不存在\n" % (dev_Ip, port))
 
             # Send data to the channel
             channel.send("end\n")

@@ -2,3 +2,4 @@ NetWork/build/
 NetWork/dist/
 NetWork/__pycache__/
 NetWork/VpnRoute.spec
+.vscode/

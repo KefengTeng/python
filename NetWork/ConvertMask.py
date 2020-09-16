@@ -1,3 +1,6 @@
+#!/bin/env python3
+# -*- coding: utf-8 -*-
+
 import re
 import cx_Oracle
 
@@ -24,9 +27,12 @@ with open(r'C:\\Users\\PaintMyLove\\Documents\\Download\\ip2.txt') as f:
         with cx_Oracle.connect('x', 'x', '127.0.0.10:1521/dbnms', encoding='UTF-8') as conn:
             cur = conn.cursor()
             sql = f"""SELECT C.LOOPADDRESS, A.INTDESCR, A.IPADDRESS, A.NETMASK
-                        FROM DEVADDR A, DEVICE C
+                        FROM DEVADDR A, DEVICE C, PORTINFO D
                         WHERE A.IPADDRESS = :ip
                         AND A.NETMASK = :binmask
+                        AND A.DEVICEID = D.DEVICEID
+                        AND A.INTDESCR = D.PORTDESCR
+                        AND D.OPERSTATUS = 'up
                         AND C.CHANGETYPE = '0'
                         AND A.DEVICEID = C.DEVICEID"""
             cur.execute(sql, [ip, binmask])

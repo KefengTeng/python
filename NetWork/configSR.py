@@ -81,7 +81,7 @@ def ConfigSR():
                         if not re.search(r'statistic enable', result, flags=re.M + re.I):
 
                             # Send data to the channel
-                            channel.send("interface {}\n".format(port))
+                            channel.send("interface {}\n".format(lport))
                             time.sleep(1)
 
                             # Receive data from the channel

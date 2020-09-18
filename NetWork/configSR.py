@@ -201,7 +201,7 @@ def ConfigSR():
                             print(channel.recv(1024).decode('utf-8', 'ignore'))
 
                             # Send data to the channel
-                            channel.send("interface {}\n".format(port))
+                            channel.send("interface {}\n".format(lport))
                             time.sleep(1)
                             # Receive data from the channel
 

@@ -33,8 +33,8 @@ for subdir in abs_dir:
     if re.search(r'2020', file_list[-1]):
         newestfile_list.append(file_list[-1])
 
-for f in newestfile_list:
-    if re.search(r'NOD06q', f):
-        os.system("cp %s /tmp/NK/" % f)
-    elif re.search(r'NOD06u', f):
-        os.system("cp %s /tmp/HQ/" % f)
+for cfg in newestfile_list:
+    if re.search(r'NOD06q', cfg):
+        os.system("cp %s /tmp/NK/" % cfg)
+    elif re.search(r'NOD06u', cfg):
+        os.system("cp %s /tmp/HQ/" % cfg)

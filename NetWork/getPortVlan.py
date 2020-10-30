@@ -11,7 +11,7 @@ username = 'xxx'
 password = 'xxx'
 enable = 'xxx'
 
-with cx_Oracle.connect('slview', 'SLzyuc2015', '136.64.201.5:1521/dbnms', encoding='UTF-8') as conn:
+with cx_Oracle.connect('xxx', 'xxx', '136.64.201.5:1521/dbnms', encoding='UTF-8') as conn:
     cur = conn.cursor()
     sql = f"""SELECT A.DEVICEMODELCODE, A.LOOPADDRESS
                 FROM DEVICE A

@@ -31,7 +31,7 @@ class TelnetClient():
         try:
             self.tn.open(Ip)
         except:
-            logging.warning('[%s]: 网络不通!' % Olt_Ip)
+            logging.warning('[%s]: 网络不通!' % Ip)
             return False
 
         # 匹配登录用户名提示符

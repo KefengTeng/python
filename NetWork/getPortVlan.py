@@ -1,6 +1,7 @@
 #!/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 import re
 import time
 import logging
@@ -11,9 +12,9 @@ username = 'xxx'
 password = 'xxx'
 enable = 'xxx'
 
-with cx_Oracle.connect('xxx', 'xxx', '136.64.201.5:1521/dbnms', encoding='UTF-8') as conn:
+with cx_Oracle.connect('xxx', 'xxx', 'x.x.x.x:x/dbnms', encoding='UTF-8') as conn:
     cur = conn.cursor()
-    sql = f"""SELECT A.DEVICEMODELCODE, A.LOOPADDRESS
+    sql = f"""SELECT A.DEVICEMODELCODE, A.LOOPADDRESS, A.DETAILMODELCODE
                 FROM DEVICE A
                WHERE A.CHANGETYPE = '0'
                  AND A.LOOPADDRESS IS NOT NULL
@@ -29,7 +30,7 @@ class TelnetClient():
         self.tn = Telnet()
         self.tn.set_debuglevel(0)
 
-    def deal_ZT(self, ip, username, password, enablepassword):
+    def deal_ZT(self, ip, model, username, password, enablepassword):
         try:
             self.tn.open(ip, timeout=10)
         except:
@@ -87,8 +88,12 @@ class TelnetClient():
             self.tn.write(b'\r\n')
             time.sleep(1)
             cmd_result += self.tn.read_very_eager().decode('ascii')
+        cmd_result = re.sub(r'Press.*[\x00-\x1f]', '', cmd_result)
         logging.warning(cmd_result)
-        with open(f'./vlanport/{ip}.txt', 'w') as f:
+        # 创建目录, 写文件
+        if not os.path.exists(f'./vlanport/{model}'):
+            os.mkdir(f'./vlanport/{model}')
+        with open(f'./vlanport/{model}/{ip}.txt', 'w') as f:
             f.write(cmd_result)
         logging.warning(f'[{ip}]: 采集成功...')
 
@@ -97,7 +102,7 @@ class TelnetClient():
         self.tn.write(b'Y\r\n')
         logging.warning(f'[{ip}]: 退出成功...')
 
-    def deal_HU(self, ip, username, password, enablepassword):
+    def deal_HU(self, ip, model, username, password, enablepassword):
         try:
             self.tn.open(ip, timeout=10)
         except:
@@ -159,8 +164,12 @@ class TelnetClient():
             self.tn.write(b' \n')
             time.sleep(1)
             cmd_result += self.tn.read_very_eager().decode('ascii')
+        cmd_result = re.sub(r'--.*[\x00-\x1f]', '', cmd_result)
         logging.warning(cmd_result)
-        with open(f'./vlanport/{ip}.txt', 'w') as f:
+        # 创建目录, 写文件
+        if not os.path.exists(f'./vlanport/{model}'):
+            os.mkdir(f'./vlanport/{model}')
+        with open(f'./vlanport/{model}/{ip}.txt', 'w') as f:
             f.write(cmd_result)
         logging.warning(f'[{ip}]: 采集成功...')
 
@@ -173,6 +182,6 @@ class TelnetClient():
 for row in rows:
     Telnet_Client = TelnetClient()
     if re.search(r'ZT', row[0]):
-        Telnet_Client.deal_ZT(row[1], username, password, enable)
+        Telnet_Client.deal_ZT(row[1], row[2], username, password, enable)
     else:
-        Telnet_Client.deal_HU(row[1], username, password, enable)
+        Telnet_Client.deal_HU(row[1], row[2], username, password, enable)

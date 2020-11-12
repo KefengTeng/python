@@ -28,7 +28,7 @@ def nose(x, y):
             a = a - 0.08
             left(3)
             forward(a)
-    enf_fill()
+    end_fill()
     penup()
     setheading(90)
     forward(25)

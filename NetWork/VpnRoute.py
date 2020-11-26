@@ -55,8 +55,9 @@ try:
     for line in Route_Result.split('\n'):
         if Route_Regex.search(line):
             Del_Net, Del_Mask = Route_Regex.search(line).groups()
-            print("[¼´½«É¾³ýÍø¶Î]:\t%s %s\n" % (Del_Net, Del_Mask))
-            print(os.popen("route DELETE %s %s" % (Del_Net, Del_Mask)).read())
+            if Del_Net != "192.168.251.0":
+                print("[¼´½«É¾³ýÍø¶Î]:\t%s %s\n" % (Del_Net, Del_Mask))
+                print(os.popen("route DELETE %s" % (Del_Net)).read())
     Company_Net = ['192.168.5.0', '192.168.6.0',
                    '192.168.118.0', '192.168.130.0']
     for Private_Net in Company_Net:

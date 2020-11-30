@@ -3,3 +3,5 @@ NetWork/dist/
 NetWork/__pycache__/
 NetWork/VpnRoute.spec
 .vscode/
+golang/bin/
+golang/pkg/

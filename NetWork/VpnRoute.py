@@ -74,6 +74,10 @@ try:
                        (CustNet, CustBinMask, GateWay, InterFace)).read())
 except AttributeError:
     print('VPN路由表已清空, 无法获取默认网关，请重连VPN之后再次运行该程序...\n程序将在10s后退出...\n')
+    for i in range(20):
+        time.sleep(0.5)
+        sys.stdout.write('#')
+        sys.stdout.flush()
 finally:
     print('程序将在10s后退出...\n')
     for i in range(20):

@@ -216,7 +216,7 @@ class TelnetClient():
             return False
 
         # 执行采集命令
-        self.tn.write(b'display  current-configuration  section esl\n')
+        self.tn.write(b'display current-configuration section esl\n')
         self.tn.write(b'\n')
         time.sleep(3)
         cmd_result = self.tn.read_very_eager().decode('ascii')

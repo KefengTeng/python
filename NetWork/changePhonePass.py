@@ -11,11 +11,10 @@ from telnetlib import Telnet
 
 # 将用户名密码保存到字典里
 src_dict = {}
-with open(r'/root/tengkf/ZT-F8/password.txt', 'r') as f:
+with open(r'/root/tengkf/F832/password.txt', 'r') as f:
     for line in f:
         userid, userpasswd = line.split()
         src_dict.setdefault(userid, userpasswd)
-# print(f'--->>>{src_dict}')
 
 username = 'tjMDU3d8k'
 password = 'TelePON2mn9'
@@ -32,20 +31,19 @@ with cx_Oracle.connect('slview', 'SLzyuc2015', '136.64.201.5:1521/dbnms', encodi
                 AND A.LOOPADDRESS IS NOT NULL
                 AND A.DEVICETYPECODE IN ('DEV_IP_X', 'DEV_IP_Y')
                 AND A.TELNETSTATUS = '1'
-                AND A.LOOPADDRESS IN (SELECT IP FROM MDUIP_HU WHERE DAY = '2020120905')
+                AND A.LOOPADDRESS IN (SELECT IP FROM MDUIP_HU WHERE DAY = '2020121001')
            """
     cur.execute(sql, [node])
     rows = cur.fetchall()
 
-#rows = (['ZT', '10.1.30.24', '98'], )
-#rows = (['ZT', '10.40.49.132', 'F832'], ['ZT', '10.12.124.110', 'F832'], ['ZT', '10.12.110.31', 'F832'], ['ZT', '10.40.171.92', 'F832'], ['ZT', '10.41.73.236', 'F832'])
-#rows = (['ZT', '10.12.134.28', 'F832'], )
+#rows = (['ZT', '10.9.48.64', 'F821'], )
+#rows = (['ZT', '10.12.55.100', 'F832'], ['ZT', '10.42.87.212', 'F832'], ['ZT', '10.41.63.157', 'F822'], ['ZT', '10.8.48.151', 'F822'], ['ZT', '10.43.72.143', 'F822'], ['ZT', '10.41.63.174', 'F822'], ['ZT', '10.9.36.51', 'F821'], ['ZT', '10.9.48.64', 'F821'], ['ZT', '10.9.48.12', 'F821'] )
 
 
 class TelnetClient():
     def __init__(self):
         self.tn = Telnet()
-        self.tn.set_debuglevel(1)
+        self.tn.set_debuglevel(0)
 
     def deal_ZT(self, ip, model, username, password, enablepassword):
         try:
@@ -114,12 +112,12 @@ class TelnetClient():
 
             # 遍历板卡
             self.tn.write(b'voice\r\n')
-            time.sleep(0.5)
+            time.sleep(1)
             for card in card_list[:-1]:
                 phone_dict.setdefault(card, {})
                 self.tn.write(
                     b'show voice sipuser pstnuser slot %d\r\n' % int(card))
-                time.sleep(0.5)
+                time.sleep(1)
                 cmd_result = self.tn.read_very_eager().decode('ascii')
                 while cmd_result.endswith('(Q to quit)'):
                     self.tn.write(b'\r\n')
@@ -145,10 +143,10 @@ class TelnetClient():
                         if vi in src_dict:
                             self.tn.write(b'sipuser user-authentication modify slot ' + ko.encode('ascii') + b' beginindex ' + ki.encode('ascii') + b' num 1 authusername ' +
                                           vi[:-1].encode('ascii') + b' password ' + src_dict[vi].encode('ascii') + b' type 2 beginno ' + vi[-1].encode('ascii') + b'\r\n')
-                            time.sleep(0.5)
+                            time.sleep(1)
                             cmd_result += self.tn.read_very_eager().decode('ascii')
                             # 写文件
-                            with open(r'/root/tengkf/ZT-F8/' + f'{node}.csv', 'a') as f:
+                            with open(r'/root/tengkf/F832/' + f'{node}.csv', 'a') as f:
                                 f.write(f'{ip},{model},{vi}\n')
 
                     logging.warning(cmd_result)
@@ -171,6 +169,32 @@ class TelnetClient():
             time.sleep(0.5)
 
         else:
+
+            # 判断F822是否为旧版本
+            old_version = 0
+            self.tn.write(b'show version\r\n')
+            time.sleep(1)
+            cmd_result = self.tn.read_very_eager().decode('ascii')
+            while cmd_result.endswith('(Q to quit)'):
+                self.tn.write(b'\r\n')
+                time.sleep(1)
+                cmd_result += self.tn.read_very_eager().decode('ascii')
+            cmd_result = re.sub(r'Press.*[\x00-\x1f]', '', cmd_result)
+            logging.warning(cmd_result)
+            if re.search(r'V1\.[12]\.0', cmd_result, re.M | re.I):
+                old_version = 1
+
+            # 获取VLAN号
+            vlan = ''
+            self.tn.write(b'show ip inband-vlan\r\n')
+            time.sleep(1)
+            cmd_result = self.tn.read_very_eager().decode('ascii')
+            cmd_result = re.sub(r'Press.*[\x00-\x1f]', '', cmd_result)
+            logging.warning(cmd_result)
+            for line in cmd_result.split('\r\n'):
+                if re.search(r'(\d+).*voip', line, re.I):
+                    vlan = re.search(r'(\d+)\s+(\S+)\s+voip',
+                                     line, re.I).group(1)
 
             # 号码对应接口字典
             phone_dict = {}
@@ -199,29 +223,18 @@ class TelnetClient():
 
             logging.warning(f'当前业务号码: --->>>{phone_dict}\r\n')
 
-            # 重新注册
-            #self.tn.write(b'sip-signout mode 0\r\n')
-            # time.sleep(1)
-            #cmd_result = self.tn.read_very_eager().decode('ascii')
-            # logging.warning(cmd_result)
-
             cmd_result = ''
             # 遍历字典
             for ko, vo in phone_dict.items():
                 if len(vo) > 0:
                     for ki, vi in vo.items():
                         if vi in src_dict:
-                            # 重新注册
-                            self.tn.write(b'sip-signout mode 0\r\n')
-                            time.sleep(1)
                             self.tn.write(b'mod-sipuser beginslot ' + ko.encode('ascii') + b' beginindex ' + ki.encode(
                                 'ascii') + b' num 1 password ' + src_dict[vi].encode('ascii') + b'\r\n')
                             time.sleep(1)
-                            self.tn.write(b'sip-signin mode 0\r\n')
-                            time.sleep(1)
                             cmd_result += self.tn.read_very_eager().decode('ascii')
                             # 写文件
-                            with open(r'/root/tengkf/ZT-F8/' + f'{node}.csv', 'a') as f:
+                            with open(r'/root/tengkf/F832/' + f'{node}.csv', 'a') as f:
                                 f.write(f'{ip},{model},{vi}\n')
 
                     logging.warning(cmd_result)
@@ -229,23 +242,27 @@ class TelnetClient():
             # 退出遍历板卡
             self.tn.write(b'exit\r\n')
 
-            # 进入配置模式
-            # self.tn.write(b'configure\r\n')
-            # time.sleep(1)
+            if vlan != '':
+                # 进入配置模式
+                self.tn.write(b'configure\r\n')
+                time.sleep(1)
 
-            # 重新注册
-            #self.tn.write(b'ip dhcp-client disable\r\n')
-            # time.sleep(1)
-            #self.tn.write(b'ip dhcp-client enable\r\n')
-            # time.sleep(1)
-            #self.tn.write(b'ip dhcp-client enable vlan 4001\r\n')
-            # time.sleep(1)
-            #self.tn.write(b'ip dhcp-client enable vlan 4002\r\n')
-            # time.sleep(1)
+                # 重新注册
+                self.tn.write(b'ip dhcp-client disable\r\n')
+                time.sleep(1)
+                self.tn.write(b'ip dhcp-client disable\r\n')
+                time.sleep(3)
+                if re.search(r'822', model) and old_version == 1:
+                    self.tn.write(b'ip dhcp-client enable\r\n')
+                    time.sleep(1)
+                else:
+                    self.tn.write(b'ip dhcp-client enable vlan ' +
+                                  vlan.encode('ascii') + b'\r\n')
+                    time.sleep(1)
 
-            # 退出配置模式
-            # self.tn.write(b'exit\r\n')
-            # time.sleep(1)
+                # 退出配置模式
+                self.tn.write(b'exit\r\n')
+                time.sleep(1)
 
             # 保存配置
             self.tn.write(b'write\r\n')
@@ -360,8 +377,7 @@ class TelnetClient():
                 cmd_result += self.tn.read_very_eager().decode('ascii')
 
                 # 写文件
-                # with open(r'/root/tengkf/HU/' + f'{node}.csv', 'a') as f:
-                with open(r'/root/tengkf/ZT/test.csv', 'a') as f:
+                with open(r'/root/tengkf/F832/' + f'{node}.csv', 'a') as f:
                     f.write(f'{ip},{model},{k}\n')
 
             logging.warning(cmd_result)

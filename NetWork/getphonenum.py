@@ -110,7 +110,7 @@ class TelnetClient():
                     self.tn.write(b'\r\n')
                     time.sleep(1)
                     cmd_result += self.tn.read_very_eager().decode('ascii')
-                cmd_result = re.sub(r'Press.*[\x00-\x1f]', '', cmd_result)
+                #cmd_result = re.sub(r'Press.*[\x00-\x1f]', '', cmd_result)
                 logging.warning(cmd_result)
                 for line in cmd_result.split('\r\n'):
                     if re.search(r'sipdigit:\s+(\S+)', line):
@@ -121,7 +121,7 @@ class TelnetClient():
             self.tn.write(b'quit\r\n')
 
             # 写文件
-            with open(r'/root/tengkf/phonenum/' + f'{node}.txt', 'a') as f:
+            with open(r'/root/tengkf/phonenum/' + f'{node}.csv', 'a') as f:
                 if len(phone_list) > 0:
                     for phonenum in phone_list:
                         f.write(f'{ip},{model},{phonenum}\n')
@@ -141,7 +141,7 @@ class TelnetClient():
                     self.tn.write(b'\r\n')
                     time.sleep(1)
                     cmd_result += self.tn.read_very_eager().decode('ascii')
-                cmd_result = re.sub(r'Press.*[\x00-\x1f]', '', cmd_result)
+                #cmd_result = re.sub(r'Press.*[\x00-\x1f]', '', cmd_result)
                 logging.warning(cmd_result)
                 for line in cmd_result.split('\r\n'):
                     if re.search(r'sipdigit:\s+(\S+)', line):
@@ -152,7 +152,7 @@ class TelnetClient():
             self.tn.write(b'quit\r\n')
 
             # 写文件
-            with open(r'/root/tengkf/phonenum/' + f'{node}.txt', 'a') as f:
+            with open(r'/root/tengkf/phonenum/' + f'{node}.csv', 'a') as f:
                 if len(phone_list) > 0:
                     for phonenum in phone_list:
                         f.write(f'{ip},{model},{phonenum}\n')
@@ -224,7 +224,7 @@ class TelnetClient():
             self.tn.write(b' \n')
             time.sleep(1)
             cmd_result += self.tn.read_very_eager().decode('ascii')
-        cmd_result = re.sub(r'--.*[\x00-\x1f]', '', cmd_result)
+        #cmd_result = re.sub(r'--.*[\x00-\x1f]', '', cmd_result)
         logging.warning(cmd_result)
 
         # 号码列表
@@ -237,7 +237,7 @@ class TelnetClient():
         logging.warning(f'当前业务号码: --->>>{phone_list}')
 
         # 写文件
-        with open(r'/root/tengkf/phonenum/' + f'{node}.txt', 'a') as f:
+        with open(r'/root/tengkf/phonenum/' + f'{node}.csv', 'a') as f:
             if len(phone_list) > 0:
                 for phonenum in phone_list:
                     f.write(f'{ip},{model},{phonenum}\n')

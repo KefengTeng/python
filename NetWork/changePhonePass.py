@@ -31,12 +31,12 @@ with cx_Oracle.connect('slview', 'SLzyuc2015', '136.64.201.5:1521/dbnms', encodi
                 AND A.LOOPADDRESS IS NOT NULL
                 AND A.DEVICETYPECODE IN ('DEV_IP_X', 'DEV_IP_Y')
                 AND A.TELNETSTATUS = '1'
-                AND A.LOOPADDRESS IN (SELECT IP FROM MDUIP_HU WHERE DAY = '2020121001')
+                AND A.LOOPADDRESS IN (SELECT IP FROM MDUIP_HU WHERE DAY = '2020121301')
            """
     cur.execute(sql, [node])
     rows = cur.fetchall()
 
-#rows = (['ZT', '10.9.48.64', 'F821'], )
+#rows = (['HU', '10.41.8.103', 'F821'], )
 #rows = (['ZT', '10.12.55.100', 'F832'], ['ZT', '10.42.87.212', 'F832'], ['ZT', '10.41.63.157', 'F822'], ['ZT', '10.8.48.151', 'F822'], ['ZT', '10.43.72.143', 'F822'], ['ZT', '10.41.63.174', 'F822'], ['ZT', '10.9.36.51', 'F821'], ['ZT', '10.9.48.64', 'F821'], ['ZT', '10.9.48.12', 'F821'] )
 
 
@@ -365,9 +365,14 @@ class TelnetClient():
         for k, v in phone_dict.items():
             cmd_result = ''
             if k in src_dict:
-                self.tn.write(b'sippstnuser auth set ' + v.encode('ascii') +
-                              b' telno ' + k.encode('ascii') + b' password-mode password' + b'\n')
-                time.sleep(0.5)
+                if re.search(r'5610', model):
+                    self.tn.write(b'sippstnuser auth set ' + v.encode('ascii') +
+                                  b' telno ' + k.encode('ascii') + b'\n')
+                    time.sleep(0.5)
+                else:
+                    self.tn.write(b'sippstnuser auth set ' + v.encode('ascii') +
+                                  b' telno ' + k.encode('ascii') + b' password-mode password' + b'\n')
+                    time.sleep(0.5)
                 cmd_result += self.tn.read_very_eager().decode('ascii')
                 self.tn.write(('+' + k).encode('ascii') + b'\n')
                 time.sleep(0.5)

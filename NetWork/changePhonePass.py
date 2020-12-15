@@ -31,7 +31,7 @@ with cx_Oracle.connect('slview', 'SLzyuc2015', '136.64.201.5:1521/dbnms', encodi
                 AND A.LOOPADDRESS IS NOT NULL
                 AND A.DEVICETYPECODE IN ('DEV_IP_X', 'DEV_IP_Y')
                 AND A.TELNETSTATUS = '1'
-                AND A.LOOPADDRESS IN (SELECT IP FROM MDUIP_HU WHERE DAY = '2020121301')
+                AND A.LOOPADDRESS IN (SELECT IP FROM MDUIP_HU WHERE DAY = '2020121502')
            """
     cur.execute(sql, [node])
     rows = cur.fetchall()
@@ -148,6 +148,10 @@ class TelnetClient():
                             # 写文件
                             with open(r'/root/tengkf/F832/' + f'{node}.csv', 'a') as f:
                                 f.write(f'{ip},{model},{vi}\n')
+                        else:
+                            # 写文件
+                            with open(r'/root/tengkf/F832/' + f'{node}_not_exists.csv', 'a') as f:
+                                f.write(f'{ip},{model},{vi}\n')
 
                     logging.warning(cmd_result)
 
@@ -235,6 +239,10 @@ class TelnetClient():
                             cmd_result += self.tn.read_very_eager().decode('ascii')
                             # 写文件
                             with open(r'/root/tengkf/F832/' + f'{node}.csv', 'a') as f:
+                                f.write(f'{ip},{model},{vi}\n')
+                        else:
+                            # 写文件
+                            with open(r'/root/tengkf/F832/' + f'{node}_not_exists.csv', 'a') as f:
                                 f.write(f'{ip},{model},{vi}\n')
 
                     logging.warning(cmd_result)
@@ -384,6 +392,10 @@ class TelnetClient():
                 # 写文件
                 with open(r'/root/tengkf/F832/' + f'{node}.csv', 'a') as f:
                     f.write(f'{ip},{model},{k}\n')
+            else:
+                # 写文件
+                with open(r'/root/tengkf/F832/' + f'{node}_not_exists.csv', 'a') as f:
+                    f.write(f'{ip},{model},{vi}\n')
 
             logging.warning(cmd_result)
 

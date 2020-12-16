@@ -373,13 +373,12 @@ class TelnetClient():
         for k, v in phone_dict.items():
             cmd_result = ''
             if k in src_dict:
-                if re.search(r'5610', model):
-                    self.tn.write(b'sippstnuser auth set ' + v.encode('ascii') +
-                                  b' telno ' + k.encode('ascii') + b'\n')
-                    time.sleep(1)
-                else:
-                    self.tn.write(b'sippstnuser auth set ' + v.encode('ascii') +
-                                  b' telno ' + k.encode('ascii') + b' password-mode password' + b'\n')
+                self.tn.write(b'sippstnuser auth set ' + v.encode('ascii') +
+                              b' telno ' + k.encode('ascii') + b'\n')
+                time.sleep(1)
+                cmd_result += self.tn.read_very_eager().decode('ascii')
+                if re.search(r'<cr>', cmd_result, re.I | re.M):
+                    self.tn.write(b'\n')
                     time.sleep(1)
                 cmd_result += self.tn.read_very_eager().decode('ascii')
                 self.tn.write(('+' + k).encode('ascii') + b'\n')

@@ -395,7 +395,7 @@ class TelnetClient():
             else:
                 # 写文件
                 with open(r'/root/tengkf/F832/' + f'{node}_not_exists.csv', 'a') as f:
-                    f.write(f'{ip},{model},{vi}\n')
+                    f.write(f'{ip},{model},{k}\n')
 
             logging.warning(cmd_result)
 

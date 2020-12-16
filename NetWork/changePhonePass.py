@@ -31,7 +31,7 @@ with cx_Oracle.connect('slview', 'SLzyuc2015', '136.64.201.5:1521/dbnms', encodi
                 AND A.LOOPADDRESS IS NOT NULL
                 AND A.DEVICETYPECODE IN ('DEV_IP_X', 'DEV_IP_Y')
                 AND A.TELNETSTATUS = '1'
-                AND A.LOOPADDRESS IN (SELECT IP FROM MDUIP_HU WHERE DAY = '2020121502')
+                AND A.LOOPADDRESS IN (SELECT IP FROM MDUIP_HU WHERE DAY = '2020121607')
            """
     cur.execute(sql, [node])
     rows = cur.fetchall()
@@ -97,7 +97,7 @@ class TelnetClient():
 
         # 获取板卡号并存至列表
         self.tn.write(b'show card\r\n')
-        time.sleep(0.5)
+        time.sleep(3)
         cmd_result = self.tn.read_very_eager().decode('ascii')
         card_list = []
         for line in cmd_result.split('\r\n'):
@@ -362,10 +362,10 @@ class TelnetClient():
 
         # 进入配置模式
         self.tn.write(b'config\n')
-        time.sleep(0.5)
+        time.sleep(1)
         # 进入语音配置
         self.tn.write(b'esl user\n')
-        time.sleep(0.5)
+        time.sleep(1)
 
         cmd_result = self.tn.read_very_eager().decode('ascii')
         logging.warning(cmd_result)
@@ -376,17 +376,17 @@ class TelnetClient():
                 if re.search(r'5610', model):
                     self.tn.write(b'sippstnuser auth set ' + v.encode('ascii') +
                                   b' telno ' + k.encode('ascii') + b'\n')
-                    time.sleep(0.5)
+                    time.sleep(1)
                 else:
                     self.tn.write(b'sippstnuser auth set ' + v.encode('ascii') +
                                   b' telno ' + k.encode('ascii') + b' password-mode password' + b'\n')
-                    time.sleep(0.5)
+                    time.sleep(1)
                 cmd_result += self.tn.read_very_eager().decode('ascii')
                 self.tn.write(('+' + k).encode('ascii') + b'\n')
-                time.sleep(0.5)
+                time.sleep(1)
                 cmd_result += self.tn.read_very_eager().decode('ascii')
                 self.tn.write(src_dict[k].encode('ascii') + b'\n')
-                time.sleep(0.5)
+                time.sleep(1)
                 cmd_result += self.tn.read_very_eager().decode('ascii')
 
                 # 写文件
@@ -401,25 +401,25 @@ class TelnetClient():
 
         # 退出语音配置
         self.tn.write(b'quit\n')
-        time.sleep(0.5)
+        time.sleep(1)
 
         # 复位SIP接口
         self.tn.write(b'interface sip 0\n')
-        time.sleep(0.5)
+        time.sleep(1)
         self.tn.write(b'reset\n')
-        time.sleep(0.5)
+        time.sleep(1)
         self.tn.write(b'y\n')
-        time.sleep(0.5)
+        time.sleep(1)
         self.tn.write(b'quit\n')
-        time.sleep(0.5)
+        time.sleep(1)
 
         # 退出配置模式
         self.tn.write(b'quit\n')
-        time.sleep(0.5)
+        time.sleep(1)
 
         # 保存配置
         self.tn.write(b'save configuration\n')
-        time.sleep(0.5)
+        time.sleep(1)
 
         # 退出登录
         self.tn.write(b'quit\n')

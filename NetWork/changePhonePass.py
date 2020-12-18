@@ -16,13 +16,13 @@ with open(r'/root/tengkf/F832/password.txt', 'r') as f:
         userid, userpasswd = line.split()
         src_dict.setdefault(userid, userpasswd)
 
-username = 'tjMDU3d8k'
-password = 'TelePON2mn9'
-enable = 'TelePON2mn9'
+username = 'xxxx'
+password = 'xxxx'
+enable = 'xxxx'
 
 node = sys.argv[1]
 
-with cx_Oracle.connect('slview', 'SLzyuc2015', '136.64.201.5:1521/dbnms', encoding='UTF-8') as conn:
+with cx_Oracle.connect('xxxx', 'xxxx', 'x.x.x.x:x/dbnms', encoding='UTF-8') as conn:
     cur = conn.cursor()
     sql = f"""SELECT A.DEVICEMODELCODE, A.LOOPADDRESS, A.DETAILMODELCODE
                FROM DEVICE_TMP A
@@ -31,13 +31,10 @@ with cx_Oracle.connect('slview', 'SLzyuc2015', '136.64.201.5:1521/dbnms', encodi
                 AND A.LOOPADDRESS IS NOT NULL
                 AND A.DEVICETYPECODE IN ('DEV_IP_X', 'DEV_IP_Y')
                 AND A.TELNETSTATUS = '1'
-                AND A.LOOPADDRESS IN (SELECT IP FROM MDUIP_HU WHERE DAY = '2020121607')
+                AND A.LOOPADDRESS IN (SELECT IP FROM MDUIP_HU WHERE DAY = '2020121801')
            """
     cur.execute(sql, [node])
     rows = cur.fetchall()
-
-#rows = (['HU', '10.41.8.103', 'F821'], )
-#rows = (['ZT', '10.12.55.100', 'F832'], ['ZT', '10.42.87.212', 'F832'], ['ZT', '10.41.63.157', 'F822'], ['ZT', '10.8.48.151', 'F822'], ['ZT', '10.43.72.143', 'F822'], ['ZT', '10.41.63.174', 'F822'], ['ZT', '10.9.36.51', 'F821'], ['ZT', '10.9.48.64', 'F821'], ['ZT', '10.9.48.12', 'F821'] )
 
 
 class TelnetClient():
@@ -148,10 +145,6 @@ class TelnetClient():
                             # 写文件
                             with open(r'/root/tengkf/F832/' + f'{node}.csv', 'a') as f:
                                 f.write(f'{ip},{model},{vi}\n')
-                        else:
-                            # 写文件
-                            with open(r'/root/tengkf/F832/' + f'{node}_not_exists.csv', 'a') as f:
-                                f.write(f'{ip},{model},{vi}\n')
 
                     logging.warning(cmd_result)
 
@@ -239,10 +232,6 @@ class TelnetClient():
                             cmd_result += self.tn.read_very_eager().decode('ascii')
                             # 写文件
                             with open(r'/root/tengkf/F832/' + f'{node}.csv', 'a') as f:
-                                f.write(f'{ip},{model},{vi}\n')
-                        else:
-                            # 写文件
-                            with open(r'/root/tengkf/F832/' + f'{node}_not_exists.csv', 'a') as f:
                                 f.write(f'{ip},{model},{vi}\n')
 
                     logging.warning(cmd_result)
@@ -390,10 +379,6 @@ class TelnetClient():
 
                 # 写文件
                 with open(r'/root/tengkf/F832/' + f'{node}.csv', 'a') as f:
-                    f.write(f'{ip},{model},{k}\n')
-            else:
-                # 写文件
-                with open(r'/root/tengkf/F832/' + f'{node}_not_exists.csv', 'a') as f:
                     f.write(f'{ip},{model},{k}\n')
 
             logging.warning(cmd_result)

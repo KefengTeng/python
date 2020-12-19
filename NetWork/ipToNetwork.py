@@ -27,7 +27,8 @@ for row in wbs.iter_rows(min_row=2):
     reversedMask = str(iprange_to_cidrs(
         row[1].value, row[2].value)[0].hostmask)
     # 写工作簿
-    cur_sheet.append([row[0].value, row[1].value, row[2].value, netWork, reversedMask])
+    cur_sheet.append([row[0].value, row[1].value,
+                      row[2].value, netWork, reversedMask])
 
 # 保存工作簿
 wbw.save(r'C:\\Users\\PaintMyLove\\Desktop\\转换结果.xlsx')

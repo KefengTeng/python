@@ -6,13 +6,6 @@ import re
 import sys
 import time
 
-# -*- coding: gbk -*-
-
-import os
-import re
-import sys
-import time
-
 # 判断网段格式是否符合要求
 Network_Regex = re.compile(r'^(\d+)\.(\d+)\.(\d+)\.(\d+)/(\d+)$')
 Flag = 1

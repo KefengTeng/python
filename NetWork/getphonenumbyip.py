@@ -1,12 +1,26 @@
-#!/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import logging
 import re
 import sys
 import time
-import logging
-#import cx_Oracle
+import sqlite3
 from telnetlib import Telnet
+
+# 创建/连接数据库对象
+conn = sqlite3.connect('ip_group.db')
+
+# 获取游标
+c = conn.cursor()
+
+# 读取数据
+t = (sys.argv[1], )
+c.execute('SELECT ip FROM device_group WHERE groupno = ?', t)
+rows = c.fetchall()
+
+# 关闭连接
+conn.close()
 
 # 将用户名密码保存到字典里
 src_dict = {}
@@ -25,71 +39,73 @@ tn = Telnet()
 tn.set_debuglevel(0)
 
 # 尝试建立telnet连接
-ip = '10.87.24.14'
-try:
-    tn.open(ip, timeout=10)
-except:
-    logging.warning(f'[{ip}]: 建立Telnet连接失败...\n')
+for row in rows:
+    ip = row[0]
+    try:
+        tn.open(ip, timeout=10)
+    except:
+        logging.warning(f'[{ip}]: 建立Telnet连接失败...\n')
 
-# 取设备回显, 判断设备类型
-DeviceType = tn.expect([], timeout=1)[2].decode('ascii').strip()
-if re.search(r'>>', DeviceType):
-    # 华为
-    pass
-elif re.search(r'##', DeviceType):
-    # 中兴
-    pass
-else:
-    # 瑞斯康达
-    # 匹配登录用户名提示符
-    tn.read_until(b'Username:', timeout=10)
-    tn.write(username.encode('ascii') + b'\n')
-    time.sleep(1)
-
-    # 匹配登录密码提示符
-    tn.read_until(b'Password:', timeout=10)
-    tn.write(password.encode('ascii') + b'\n')
-    time.sleep(1)
-
-    # 首次获取登录结果
-    cmd_result = tn.read_very_eager().decode('ascii')
-
-    # 判断是否成功登录
-    if re.search(r'>\s*$', cmd_result):
-        logging.warning(f'[{ip}]: 登录成功...')
+    # 取设备回显, 判断设备类型
+    DeviceType = tn.expect([], timeout=1)[2].decode('ascii').strip()
+    if re.search(r'>>', DeviceType):
+        # 华为
+        pass
+    elif re.search(r'##', DeviceType):
+        # 中兴
+        pass
     else:
-        logging.warning(f'[{ip}]: 登录失败...')
-
-    # 执行enable
-    tn.write(b'enable\n')
-    time.sleep(1)
-
-    # 获取enable结果
-    cmd_result = tn.read_very_eager().decode('ascii')
-    logging.warning(cmd_result)
-
-    # 判断是否成功进入特权模式
-    if re.search(r'#\s*$', cmd_result):
-        logging.warning(f'[{ip}]: 进入特权模式成功...')
-    else:
-        logging.warning(f'[{ip}]: 进入特权模式失败...')
-
-    # 执行采集命令
-    tn.write(b'show running-config voip\n')
-    time.sleep(1)
-
-    cmd_result = tn.read_very_eager().decode('ascii')
-    while cmd_result.endswith('bytes)'):
-        tn.write(b' ')
+        # 瑞斯康达
+        # 匹配登录用户名提示符
+        tn.read_until(b'Username:', timeout=10)
+        tn.write(username.encode('ascii') + b'\n')
         time.sleep(1)
-        cmd_result += tn.read_very_eager().decode('ascii')
-    logging.warning(cmd_result)
 
-    # 号码对应接口字典
-    phone_list = []
-    for line in cmd_result.split('\r\n'):
-        if re.search(r'sip pots authentication.*tj.ctcims.cn', line, re.I):
-            phone_list.append(re.search(
-                r'sip pots authentication (\S+)\@tj.ctcims.cn potsId (\d+)', line, re.I).group(1))
+        # 匹配登录密码提示符
+        tn.read_until(b'Password:', timeout=10)
+        tn.write(password.encode('ascii') + b'\n')
+        time.sleep(1)
 
-    logging.warning(f'当前设备业务号码: --->>>{phone_list}\n')
+        # 首次获取登录结果
+        cmd_result = tn.read_very_eager().decode('ascii')
+
+        # 判断是否成功登录
+        if re.search(r'>\s*$', cmd_result):
+            logging.warning(f'[{ip}]: 登录成功...')
+        else:
+            logging.warning(f'[{ip}]: 登录失败...')
+
+        # 执行enable
+        tn.write(b'enable\n')
+        time.sleep(1)
+
+        # 获取enable结果
+        cmd_result = tn.read_very_eager().decode('ascii')
+        logging.warning(cmd_result)
+
+        # 判断是否成功进入特权模式
+        if re.search(r'#\s*$', cmd_result):
+            logging.warning(f'[{ip}]: 进入特权模式成功...')
+        else:
+            logging.warning(f'[{ip}]: 进入特权模式失败...')
+
+        # 执行采集命令
+        logging.warning(f'[{ip}]: 开始执行采集...')
+        tn.write(b'show running-config voip\n')
+        time.sleep(1)
+
+        cmd_result = tn.read_very_eager().decode('ascii')
+        while cmd_result.endswith('bytes)'):
+            tn.write(b' ')
+            time.sleep(1)
+            cmd_result += tn.read_very_eager().decode('ascii')
+        logging.warning(cmd_result)
+
+        # 号码对应接口字典
+        phone_list = []
+        for line in cmd_result.split('\r\n'):
+            if re.search(r'sip pots authentication.*tj.ctcims.cn', line, re.I):
+                phone_list.append(re.search(
+                    r'sip pots authentication (\S+)\@tj.ctcims.cn potsId (\d+)', line, re.I).group(1))
+
+        logging.warning(f'当前设备业务号码: --->>>{phone_list}\n')

@@ -1,14 +1,14 @@
 #!/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
 import sys
 import sqlite3
+import subprocess
 
 # 分组大小
 num = int(input('请输入分组大小: '))
 
-# 创建/连接内存数据库对象
+# 创建/连接数据库对象
 conn = sqlite3.connect('ip_group.db')
 
 # 获取游标
@@ -46,4 +46,6 @@ conn.close()
 
 # 调用进程
 for row in rows:
-    os.system(f'./NetWork/getphonenumbyip.py {row[0]} &> {row[0]}.txt')
+    with open(f'{row[0]}.txt', 'a') as f:
+        subprocess.Popen(['./NetWork/getphonenumbyip.py',
+                          row[0], '&'], stdout=f, stderr=f)

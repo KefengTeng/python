@@ -10,6 +10,7 @@ from telnetlib import Telnet
 
 # 获取分组号
 no = sys.argv[1]
+
 # 创建/连接数据库对象
 conn = sqlite3.connect('ip_group.db')
 
@@ -30,6 +31,7 @@ tn = Telnet()
 tn.set_debuglevel(0)
 
 # 尝试建立telnet连接
+n = 0
 for row in rows:
     ip = row[0]
     try:
@@ -155,6 +157,7 @@ for row in rows:
 
                 # 采集成功则退出用户名/密码循环
                 break
+
         elif re.search(r'##', DeviceType):
             # 中兴
 
@@ -331,6 +334,7 @@ for row in rows:
 
         elif re.search(r'Username:', DeviceType):
             # 瑞斯康达
+
             username = 'telecomadmin'
             password = 'nE7jA%5m'
 
@@ -402,7 +406,13 @@ for row in rows:
             tn.write(b'quit\r\n')
             logging.warning(f'[{ip}]: 退出成功...')
 
+            
+        else:
+            logging.warning(f'[{ip}: {DeviceType}.strip()]: 其他类型设备...')
+            
     except:
         logging.warning(f'[{ip}]: 建立Telnet连接失败...\n')
     finally:
         tn.close()
+    n += 1
+    logging.warning(f'当前已处理设备/总设备: {n}/{len(rows)}...')

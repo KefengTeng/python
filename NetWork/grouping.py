@@ -11,7 +11,7 @@ num = int(input('请输入分组大小: '))
 # 创建/连接数据库对象
 conn = sqlite3.connect('ip_group.db')
 
-# 获取游标1
+# 获取游标
 c = conn.cursor()
 
 # 建表

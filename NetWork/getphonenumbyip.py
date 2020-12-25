@@ -407,6 +407,7 @@ for row in rows:
             logging.warning(f'[{ip}]: 退出成功...')
 
         else:
+            # 去掉回车及换行
             DeviceType = DeviceType.replace('\r', '').replace('\n', '')
             logging.warning(f"[{ip}: {DeviceType}]: 其他类型设备...")
 

@@ -406,13 +406,12 @@ for row in rows:
             tn.write(b'quit\r\n')
             logging.warning(f'[{ip}]: 退出成功...')
 
-            
         else:
-            logging.warning(f'[{ip}: {DeviceType}.strip()]: 其他类型设备...')
-            
+            logging.warning(f"[{ip}: {DeviceType}]: 其他类型设备...")
+
     except:
         logging.warning(f'[{ip}]: 建立Telnet连接失败...\n')
     finally:
         tn.close()
     n += 1
-    logging.warning(f'当前已处理设备/总设备: {n}/{len(rows)}...')
+    logging.warning(f'当前分组已处理设备数/总设备数: {n}/{len(rows)}...')

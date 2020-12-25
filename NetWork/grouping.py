@@ -11,7 +11,7 @@ num = int(input('请输入分组大小: '))
 # 创建/连接数据库对象
 conn = sqlite3.connect('ip_group.db')
 
-# 获取游标
+# 获取游标1
 c = conn.cursor()
 
 # 建表
@@ -22,7 +22,7 @@ c.execute('DELETE FROM device_group')
 
 # 插入数据
 device = []
-with open(r'ip.txt', 'r') as f:
+with open(r'/tmp/telephone/ip.txt', 'r') as f:
     # 列表解析, 去掉换行
     lines = [x.strip() for x in f.readlines()]
     # 列表解析, 分组
@@ -46,6 +46,6 @@ conn.close()
 
 # 调用进程
 for row in rows:
-    with open(f'{row[0]}.txt', 'a') as f:
-        subprocess.Popen(['./NetWork/getphonenumbyip.py',
+    with open(f'/tmp/telephone/logs/{row[0]}.txt', 'a') as f:
+        subprocess.Popen(['/tmp/telephone/getphonenumbyip.py',
                           row[0], '&'], stdout=f, stderr=f)

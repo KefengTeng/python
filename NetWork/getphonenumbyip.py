@@ -24,13 +24,6 @@ rows = c.fetchall()
 # 关闭连接
 conn.close()
 
-# 将用户名密码保存到字典里
-src_dict = {}
-# with open(r'/root/tengkf/F832/password.txt', 'r') as f:
-#     for line in f:
-#         userid, userpasswd = line.split()
-#         src_dict.setdefault(userid, userpasswd)
-
 # 创建一个Telnet对象
 tn = Telnet()
 # 设置调试等级
@@ -150,7 +143,7 @@ for row in rows:
                 logging.warning(f'当前业务号码: --->>>{phone_list}')
 
                 # 写文件
-                with open(r'/root/tengkf/phonenum/' + f'{no}.csv', 'a') as f:
+                with open(r'/tmp/telephone/data/' + f'{no}.csv', 'a') as f:
                     if len(phone_list) > 0:
                         for phonenum in phone_list:
                             f.write(f'{ip}:{mgmt_ip},{model},{phonenum}\n')
@@ -278,7 +271,7 @@ for row in rows:
                     tn.write(b'quit\r\n')
 
                     # 写文件
-                    with open(r'/root/tengkf/phonenum/' + f'{no}.csv', 'a') as f:
+                    with open(r'/tmp/telephone/data/' + f'{no}.csv', 'a') as f:
                         if len(phone_list) > 0:
                             for phonenum in phone_list:
                                 f.write(f'{ip}:{mgmt_ip},{model},{phonenum}\n')
@@ -323,7 +316,7 @@ for row in rows:
                     tn.write(b'quit\r\n')
 
                     # 写文件
-                    with open(r'/root/tengkf/phonenum/' + f'{no}.csv', 'a') as f:
+                    with open(r'/tmp/telephone/data/' + f'{no}.csv', 'a') as f:
                         if len(phone_list) > 0:
                             for phonenum in phone_list:
                                 f.write(f'{ip}:{mgmt_ip},{model},{phonenum}\n')
@@ -356,9 +349,11 @@ for row in rows:
 
             # 判断是否成功登录
             if re.search(r'>\s*$', cmd_result):
-                logging.warning(f'[{ip}]: 登录成功...')
+                logging.warning(
+                    f'①[{ip}: [A8-C, {username}, {password}]]: 登录成功...')
             else:
-                logging.warning(f'[{ip}]: 登录失败...')
+                logging.warning(
+                    f'①[{ip}: [A8-C, {username}, {password}]]: 登录失败...')
 
             # 执行enable
             tn.write(b'enable\n')
@@ -370,9 +365,11 @@ for row in rows:
 
             # 判断是否成功进入特权模式
             if re.search(r'#\s*$', cmd_result):
-                logging.warning(f'[{ip}]: 进入特权模式成功...')
+                logging.warning(
+                    f'②[{ip}: [A8-C, {username}, {password}]]: 进入特权模式成功...')
             else:
-                logging.warning(f'[{ip}]: 进入特权模式失败...')
+                logging.warning(
+                    f'②[{ip}: [A8-C, {username}, {password}]]: 进入特权模式失败...')
 
             # 执行采集命令
             logging.warning(f'[{ip}]: 开始执行采集...')
@@ -396,7 +393,7 @@ for row in rows:
             logging.warning(f'当前设备业务号码: --->>>{phone_list}\n')
 
             # 写文件
-            with open(r'/root/tengkf/phonenum/' + f'{no}.csv', 'a') as f:
+            with open(r'/tmp/telephone/data/' + f'{no}.csv', 'a') as f:
                 if len(phone_list) > 0:
                     for phonenum in phone_list:
                         f.write(f'{ip}:{ip},A8-C,{phonenum}\n')

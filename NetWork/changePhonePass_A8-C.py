@@ -115,7 +115,7 @@ for row in rows:
                 cmd_result += tn.read_very_eager().decode('ascii')
 
                 # 写文件
-                with open(r'/tmp/telephone/data/A8C/' + f'{no}.csv', 'a') as f:
+                with open(r'/tmp/telephone/data/A8-C/' + f'{no}.csv', 'a') as f:
                     f.write(f'{ip},A8-C,{k}\n')
 
             logging.warning(cmd_result)

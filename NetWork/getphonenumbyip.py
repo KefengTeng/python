@@ -387,12 +387,12 @@ for row in rows:
                 cmd_result += tn.read_very_eager().decode('ascii')
             logging.warning(cmd_result)
 
-            # 号码对应接口字典
+            # 号码列表
             phone_list = []
             for line in cmd_result.split('\r\n'):
                 if re.search(r'sip pots authentication.*tj.ctcims.cn', line, re.I):
                     phone_list.append(re.search(
-                        r'sip pots authentication (\S+)\@tj.ctcims.cn potsId (\d+)', line, re.I).group(1))
+                        r'sip pots authentication (\S+)\@tj.ctcims.cn potsId \d+', line, re.I).group(1))
 
             logging.warning(f'当前设备业务号码: --->>>{phone_list}\n')
 

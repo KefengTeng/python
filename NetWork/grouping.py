@@ -4,8 +4,8 @@
 import sqlite3
 import subprocess
 
-# 分组大小
-num = int(input('请输入分组大小: '))
+# 分组数量
+num = int(input('请输入分组数量: '))
 
 # 创建/连接数据库对象
 conn = sqlite3.connect('ip_group.db')

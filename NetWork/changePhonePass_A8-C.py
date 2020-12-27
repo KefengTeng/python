@@ -10,13 +10,13 @@ from telnetlib import Telnet
 
 # 将用户名密码保存到字典里
 src_dict = {}
-with open(r'/tmp/telephone/password.txt', 'r') as f:
+with open(r'/home/brokensmile/telephone/password.txt', 'r') as f:
     for line in f:
         userid, userpasswd = line.split()
         src_dict.setdefault(userid, userpasswd)
 
-username = 'xxxx'
-password = 'xxxx'
+username = 'telecomadmin'
+password = 'nE7jA%5m'
 
 # 获取分组号
 no = sys.argv[1]
@@ -64,6 +64,7 @@ for row in rows:
         else:
             logging.warning(
                 f'①[{ip}: [A8-C, {username}, {password}]]: 登录失败...')
+            continue
         # 执行enable
         tn.write(b'enable\n')
         time.sleep(1)
@@ -77,6 +78,7 @@ for row in rows:
         else:
             logging.warning(
                 f'②[{ip}: [A8-C, {username}, {password}]]: 进入特权模式失败...')
+            continue
         # 执行采集命令
         logging.warning(f'[{ip}]: 开始执行采集...')
         tn.write(b'show running-config voip\n')
@@ -115,7 +117,7 @@ for row in rows:
                 cmd_result += tn.read_very_eager().decode('ascii')
 
                 # 写文件
-                with open(r'/tmp/telephone/data/A8-C/' + f'{no}.csv', 'a') as f:
+                with open(r'/home/brokensmile/telephone/data/A8-C/' + f'{no}.csv', 'a') as f:
                     f.write(f'{ip},A8-C,{k}\n')
 
             logging.warning(cmd_result)

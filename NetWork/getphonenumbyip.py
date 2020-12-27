@@ -358,7 +358,7 @@ for row in rows:
             else:
                 logging.warning(
                     f'①[{ip}: [A8-C, {username}, {password}]]: 登录失败...')
-
+                continue
             # 执行enable
             tn.write(b'enable\n')
             time.sleep(1)
@@ -374,7 +374,7 @@ for row in rows:
             else:
                 logging.warning(
                     f'②[{ip}: [A8-C, {username}, {password}]]: 进入特权模式失败...')
-
+                continue
             # 执行采集命令
             logging.warning(f'[{ip}]: 开始执行采集...')
             tn.write(b'show running-config voip\n')

@@ -21,7 +21,7 @@ c.execute('DELETE FROM device_group')
 
 # 插入数据
 device = []
-with open(r'/tmp/telephone/ip.txt', 'r') as f:
+with open(r'/home/brokensmile/telephone/ip.txt', 'r') as f:
     # 列表解析, 去掉换行
     lines = [x.strip() for x in f.readlines()]
     # 列表解析, 分组
@@ -45,6 +45,6 @@ conn.close()
 
 # 调用进程
 for row in rows:
-    with open(f'/tmp/telephone/logs/{row[0]}.txt', 'a') as f:
-        subprocess.Popen(['/tmp/telephone/getphonenumbyip.py',
+    with open(f'/home/brokensmile/telephone/logs/{row[0]}.txt', 'a') as f:
+        subprocess.Popen(['/home/brokensmile/telephone/getphonenumbyip.py',
                           row[0], '&'], stdout=f, stderr=f)

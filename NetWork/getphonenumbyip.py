@@ -145,7 +145,7 @@ for row in rows:
                 logging.warning(f'当前业务号码: --->>>{phone_list}')
 
                 # 写文件
-                with open(r'/tmp/telephone/data/' + f'{no}.csv', 'a') as f:
+                with open(r'/home/brokensmile/telephone/data/' + f'{no}.csv', 'a') as f:
                     if len(phone_list) > 0:
                         for phonenum in phone_list:
                             f.write(f'{ip}:{mgmt_ip},{model},{phonenum}\n')
@@ -274,7 +274,7 @@ for row in rows:
                     tn.write(b'quit\r\n')
 
                     # 写文件
-                    with open(r'/tmp/telephone/data/' + f'{no}.csv', 'a') as f:
+                    with open(r'/home/brokensmile/telephone/data/' + f'{no}.csv', 'a') as f:
                         if len(phone_list) > 0:
                             for phonenum in phone_list:
                                 f.write(f'{ip}:{mgmt_ip},{model},{phonenum}\n')
@@ -319,7 +319,7 @@ for row in rows:
                     tn.write(b'quit\r\n')
 
                     # 写文件
-                    with open(r'/tmp/telephone/data/' + f'{no}.csv', 'a') as f:
+                    with open(r'/home/brokensmile/telephone/data/' + f'{no}.csv', 'a') as f:
                         if len(phone_list) > 0:
                             for phonenum in phone_list:
                                 f.write(f'{ip}:{mgmt_ip},{model},{phonenum}\n')
@@ -397,7 +397,7 @@ for row in rows:
             logging.warning(f'当前设备业务号码: --->>>{phone_list}\n')
 
             # 写文件
-            with open(r'/tmp/telephone/data/' + f'{no}.csv', 'a') as f:
+            with open(r'/home/brokensmile/telephone/data/' + f'{no}.csv', 'a') as f:
                 if len(phone_list) > 0:
                     for phonenum in phone_list:
                         f.write(f'{ip}:{ip},A8-C,{phonenum}\n')

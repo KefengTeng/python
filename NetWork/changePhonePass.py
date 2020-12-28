@@ -1,13 +1,14 @@
 #!/bin/env python3
 # -*- coding: utf-8 -*-
 
+import logging
 import os
 import re
 import sys
 import time
-import logging
-import cx_Oracle
 from telnetlib import Telnet
+
+import cx_Oracle
 
 # 将用户名密码保存到字典里
 src_dict = {}

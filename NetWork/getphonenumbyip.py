@@ -3,9 +3,9 @@
 
 import logging
 import re
+import sqlite3
 import sys
 import time
-import sqlite3
 from telnetlib import Telnet
 
 # 获取分组号

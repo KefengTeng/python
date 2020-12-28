@@ -1,11 +1,11 @@
 #!/bin/env python3
 # -*- coding: utf-8 -*-
 
+import logging
 import re
+import sqlite3
 import sys
 import time
-import logging
-import sqlite3
 from telnetlib import Telnet
 
 # 将用户名密码保存到字典里

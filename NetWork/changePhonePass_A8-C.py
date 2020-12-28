@@ -137,9 +137,12 @@ for row in rows:
         # 退出登录
         tn.write(b'quit\n')
         logging.warning(f'[{ip}]: 退出成功...')
+    except ConnectionResetError:
+        logging.warning(f'[{ip}]: Telnet连接被重置...\n')
     except:
         logging.warning(f'[{ip}]: 建立Telnet连接失败...\n')
     finally:
         tn.close()
+
     n += 1
     logging.warning(f'当前分组已处理设备数/总设备数: {n}/{len(rows)}...')

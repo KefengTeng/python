@@ -411,6 +411,8 @@ for row in rows:
             DeviceType = DeviceType.replace('\r', '').replace('\n', '')
             logging.warning(f"[{ip}: {DeviceType}]: 其他类型设备...")
 
+    except ConnectionResetError:
+        logging.warning(f'[{ip}]: Telnet连接被重置...\n')
     except:
         logging.warning(f'[{ip}]: 建立Telnet连接失败...\n')
     finally:

@@ -63,7 +63,7 @@ for row in rows:
 
                 # 截取设备型号
                 model = 'null'
-                if re.search(r'Software\s+\(\S+\)', cmd_result, re.M):
+                if re.search(r'Software\s+\(\S+\)', cmd_result, re.M | re.I):
                     model = re.search(r'Software\s+\((\S+)\)',
                                       cmd_result, re.M).group(1)
 

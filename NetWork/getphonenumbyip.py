@@ -68,11 +68,11 @@ for row in rows:
                                       cmd_result, re.M).group(1)
 
                 # 设备首次登陆提醒处理
-                if re.search(r"Press\s+'Q'\s+to\s+break", cmd_result, re.M):
+                if re.search(r"Press\s+'Q'\s+to\s+break", cmd_result, re.M | re.I):
                     tn.write(b'Q')
                     time.sleep(1)
                     cmd_result = tn.read_very_eager().decode('ascii')
-                elif re.search(r"Are you sure to modify system time", cmd_result, re.M):
+                elif re.search(r"Are you sure to modify system time", cmd_result, re.M | re.I):
                     tn.write(b'n')
                     time.sleep(1)
                     cmd_result = tn.read_very_eager().decode('ascii')

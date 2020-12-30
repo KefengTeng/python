@@ -48,19 +48,19 @@ class TelnetClient():
             # 获取登陆提示符
             self.tn.read_until(b'#', timeout=10)
             self.tn.write(b'\r\n')
+            time.sleep(1)
 
             # 匹配登录用户名提示符
-            time.sleep(1)
             self.tn.read_until(b'Login:', timeout=10)
             self.tn.write(username.encode('ascii') + b'\r\n')
+            time.sleep(1)
 
             # 匹配登录密码提示符
-            time.sleep(1)
             self.tn.read_until(b'Password:', timeout=10)
             self.tn.write(password.encode('ascii') + b'\r\n')
+            time.sleep(3)
 
             # 获取登录结果
-            time.sleep(3)
             cmd_result = self.tn.read_very_eager().decode('ascii')
             logging.warning(cmd_result)
 
@@ -75,9 +75,9 @@ class TelnetClient():
             self.tn.write(b'enable\r\n')
             self.tn.read_until(b'Please input password:', timeout=10)
             self.tn.write(enablepassword.encode('ascii') + b'\r\n')
+            time.sleep(3)
 
             # 获取enable结果
-            time.sleep(3)
             cmd_result = self.tn.read_very_eager().decode('ascii')
             logging.warning(cmd_result)
 
@@ -283,14 +283,14 @@ class TelnetClient():
             time.sleep(1)
             self.tn.read_until(b'>>User name:', timeout=10)
             self.tn.write(username.encode('ascii') + b'\n')
+            time.sleep(1)
 
             # 匹配登录密码提示符
-            time.sleep(1)
             self.tn.read_until(b'>>User password:', timeout=10)
             self.tn.write(password.encode('ascii') + b'\n')
+            time.sleep(3)
 
             # 首次获取登录结果
-            time.sleep(3)
             cmd_result = self.tn.read_very_eager().decode('ascii')
 
             # 设备首次登陆提醒处理

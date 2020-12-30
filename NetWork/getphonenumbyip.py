@@ -51,14 +51,14 @@ for row in rows:
                 # 匹配登录用户名提示符
                 tn.read_until(b'>>User name:', timeout=10)
                 tn.write(username.encode('ascii') + b'\n')
+                time.sleep(1)
 
                 # 匹配登录密码提示符
-                time.sleep(1)
                 tn.read_until(b'>>User password:', timeout=10)
                 tn.write(password.encode('ascii') + b'\n')
+                time.sleep(3)
 
                 # 首次获取登录结果
-                time.sleep(3)
                 cmd_result = tn.read_very_eager().decode('ascii')
 
                 # 截取设备型号
@@ -338,8 +338,7 @@ for row in rows:
             username = 'telecomadmin'
             password = 'nE7jA%5m'
 
-            # 匹配登录用户名提示符
-            tn.read_until(b'Username:', timeout=10)
+            # 输入用户名
             tn.write(username.encode('ascii') + b'\n')
             time.sleep(1)
 
@@ -405,6 +404,69 @@ for row in rows:
             # 退出登录
             tn.write(b'quit\r\n')
             logging.warning(f'[{ip}]: 退出成功...')
+
+        elif re.search(r'F\d{3}', DeviceType):
+            # 中兴FTTH
+
+            model = 'null'
+            # 截取设备型号
+            if re.search(r'F\d{3}', DeviceType, re.M | re.I):
+                model = re.search(r'(F\d{3})', DeviceType).group(1)
+
+            # 密码字典
+            zt_dict = {'root': 'root',
+                       'Zte123': 'root'}
+
+            for password, username in zt_dict.items():
+                # 输入用户名
+                tn.read_until(b'Login:', timeout=10)
+                tn.write(username.encode('ascii') + b'\n')
+                time.sleep(1)
+
+                # 匹配登录密码提示符
+                tn.read_until(b'Password:', timeout=10)
+                tn.write(password.encode('ascii') + b'\n')
+                time.sleep(1)
+
+                # 首次获取登录结果
+                cmd_result = tn.read_very_eager().decode('ascii')
+
+                # 判断是否成功登录
+                if re.search(r'#\s*$', cmd_result):
+                    logging.warning(
+                        f'①[{ip}: [{model}, {username}, {password}]]: 登录成功...')
+                else:
+                    logging.warning(
+                        f'①[{ip}: [{model}, {username}, {password}]]: 登录失败, 尝试其他用户名/密码...')
+                    continue
+
+                # 执行采集命令
+                logging.warning(f'[{ip}]: 开始执行采集...')
+                tn.write(b'sendcmd 1 DB p VoIPSIPLine\n')
+                time.sleep(1)
+                cmd_result = tn.read_very_eager().decode('ascii')
+
+                # 号码列表
+                phone_list = []
+                for line in cmd_result.split('\r\n'):
+                    if re.search(r'name="AuthUserName" val="\S+"', line, re.I):
+                        phone_list.append(re.search(
+                            r'name="AuthUserName" val="(.*)"', line, re.I).group(1))
+
+                logging.warning(f'当前设备业务号码: --->>>{phone_list}\n')
+
+                # 写文件
+                with open(r'/home/brokensmile/telephone/data/' + f'{no}.csv', 'a') as f:
+                    if len(phone_list) > 0:
+                        for phonenum in phone_list:
+                            f.write(f'{ip}:{ip},{model},{phonenum}\n')
+
+                # 退出登录
+                tn.write(b'exit\r\n')
+                logging.warning(f'[{ip}]: 退出成功...')
+
+                # 采集成功则退出用户名/密码循环
+                break
 
         else:
             # 去掉回车及换行

@@ -415,7 +415,7 @@ for row in rows:
 
             # 密码字典
             zt_dict = {'root': 'root',
-                       'Zte123': 'root'}
+                       'Zte521': 'root'}
 
             for password, username in zt_dict.items():
                 # 输入用户名

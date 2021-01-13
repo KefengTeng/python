@@ -449,7 +449,7 @@ for row in rows:
                 # 号码列表
                 phone_list = []
                 for line in cmd_result.split('\r\n'):
-                    if re.search(r'name="AuthUserName" val="\S+"', line, re.I):
+                    if re.search(r'name="AuthUserName" val="\S+?"', line, re.I):
                         phone_list.append(re.search(
                             r'name="AuthUserName" val="(.*)"', line, re.I).group(1))
 

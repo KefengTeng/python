@@ -35,6 +35,7 @@ for row in wbr.iter_rows(min_row=2):
 # 写表头
 wbw.append(['接入号', 'SR设备IP', 'SR/MSE的Trunk口',
             '外层VLANID', '外层VLAN', 'VLANID', 'IP地址'])
+# 写数据
 for k, v in info_dict.items():
     wbw.append([k, str(v['SR设备IP']), str(v['SR/MSE的Trunk口']),
                 str(v['外层VLANID']), str(v['外层VLAN']), str(v['VLANID']), str(v['IP地址'])])

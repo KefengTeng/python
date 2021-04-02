@@ -1,0 +1,7 @@
+NetWork/build/
+NetWork/dist/
+NetWork/__pycache__/
+NetWork/*.spec
+.vscode/
+golang/bin/
+golang/pkg/

@@ -1,0 +1,59 @@
+---
+- name: Copy files to target hosts and update openssh
+  hosts: all
+
+  tasks:
+  - name: Modify telnet-server config file to enable telnet-server
+    lineinfile:
+      path: /etc/xinetd.d/telnet
+      regexp: 'disable'
+      line: '        disable         = no'
+
+  - name: Restart xinetd service
+    service:
+      name: xinetd
+      state: restarted
+
+  - name: Extract openssl.tar.gz into /usr/local/src/
+    unarchive:
+      src: /root/tengkf/openssh/openssl-1.1.1g.tar.gz
+      dest: /usr/local/src/
+
+  - name: Extract openssh.tar.gz into /usr/local/src/
+    unarchive:
+      src: /root/tengkf/openssh/openssh-8.3p1.tar.gz
+      dest: /usr/local/src/
+
+  - name: Make install openssl
+    shell: "{{ item }}"
+    args:
+      chdir: /usr/local/src/openssl-1.1.1g/
+    with_items:
+      - ./config --prefix=/usr/local/openssl threads zlib-dynamic shared --with-zlib-lib=/usr/local/zlib/lib --with-zlib-include=/usr/local/zlib/include
+      - make
+      - make install
+      - echo "/usr/local/openssl/lib" >/etc/ld.so.conf.d/openssl.conf && ldconfig
+      - find / -type l -name libssl.\* -exec bash -c "ls {}|grep -v local|grep -v "so.4" >>libssl.txt" \;
+      - find / -type l -name libcrypto.\* -exec bash -c "ls {}|grep -v local|grep -v "so.4" >>libcrypto.txt" \;
+
+  - name: Make install openssh
+    shell: "{{ item }}"
+    args:
+      chdir: /usr/local/src/openssh-8.3p1/
+    with_items:
+      - ./configure --prefix=/usr/local/openssh --sysconfdir=/etc/ssh --with-ssl-dir=/usr/local/openssl --with-zlib=/usr/local/zlib --with-md5-passwords --without-hardening --with-selinux --with-pam
+      - make
+      - /etc/init.d/sshd stop
+      - make install
+      - /etc/init.d/sshd start
+
+  - name: Modify telnet-server config file to disable telnet-server
+    lineinfile:
+      path: /etc/xinetd.d/telnet
+      regexp: 'disable'
+      line: '        disable         = yes'
+
+  - name: Restart xinetd service
+    service:
+      name: xinetd
+      state: restarted

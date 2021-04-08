@@ -89,11 +89,10 @@ class TelnetClient():
                 if re.search(r'^\s+(\d)', line):
                     card_list.append(re.search(r'^\s*(\d)', line).group(1))
 
+            # 号码字典
+            phone_dict = {}
             # 执行采集命令
             if re.search(r'98', model):
-
-                # 号码列表
-                phone_list = []
 
                 # 遍历板卡
                 self.tn.write(b'voice\r\n')
@@ -107,25 +106,30 @@ class TelnetClient():
                         self.tn.write(b'\r\n')
                         time.sleep(1)
                         cmd_result += self.tn.read_very_eager().decode('ascii')
-                    #cmd_result = re.sub(r'Press.*[\x00-\x1f]', '', cmd_result)
+                    cmd_result = re.sub(
+                        r'Press any key to continue \(Q to quit\)\\x00', '', cmd_result)
                     logging.warning(cmd_result)
                     for line in cmd_result.split('\r\n'):
-                        if re.search(r'sipdigit:\s+(\S+)', line):
-                            phone_list.append(
-                                re.search(r'sipdigit:\s+(\S+)', line).group(1))
+                        if re.search(r'slot:\s+\d+', line):
+                            slot = re.search(r'slot:\s+(\d+)',
+                                             line, re.I).group(1)
+                        if re.search(r'index:\s+\d+', line):
+                            port = re.search(
+                                r'index:\s+(\d+)', line, re.I).group(1)
+                        if re.search(r'sipdigit:\s+\S+', line):
+                            no = re.search(r'sipdigit:\s+(\S+)',
+                                           line, re.I).group(1)
+                            phone_dict.setdefault(slot + '/' + port, no)
 
-                logging.warning(f'当前业务号码: --->>>{phone_list}')
+                logging.warning(f'当前业务号码: --->>>{phone_dict}')
                 self.tn.write(b'quit\r\n')
 
                 # 写文件
                 with open(r'/root/tengkf/phonenum/' + f'{node}.csv', 'a') as f:
-                    if len(phone_list) > 0:
-                        for phonenum in phone_list:
-                            f.write(f'{ip},{model},{phonenum}\n')
+                    if len(phone_dict) > 0:
+                        for k, v in phone_dict.items():
+                            f.write(f'{ip},{model},{k},{v}\n')
             else:
-
-                # 号码列表
-                phone_list = []
 
                 # 遍历板卡
                 self.tn.write(b'ag\r\n')
@@ -138,21 +142,25 @@ class TelnetClient():
                         self.tn.write(b'\r\n')
                         time.sleep(1)
                         cmd_result += self.tn.read_very_eager().decode('ascii')
-                    #cmd_result = re.sub(r'Press.*[\x00-\x1f]', '', cmd_result)
+                    cmd_result = re.sub(
+                        r'Press any key to continue \(Q to quit\)\\x00', '', cmd_result)
                     logging.warning(cmd_result)
                     for line in cmd_result.split('\r\n'):
-                        if re.search(r'sipdigit:\s+(\S+)', line):
-                            phone_list.append(
-                                re.search(r'sipdigit:\s+(\S+)', line).group(1))
+                        if re.search(r'index:\s+\d+', line):
+                            port = re.search(
+                                r'index:\s+(\d+)', line, re.I).group(1)
+                        if re.search(r'sipdigit:\s+\S+', line):
+                            no = re.search(r'sipdigit:\s+(\S+)', line).group(1)
+                            phone_dict.setdefault(card + '/' + port, no)
 
-                logging.warning(f'当前业务号码: --->>>{phone_list}')
+                logging.warning(f'当前业务号码: --->>>{phone_dict}')
                 self.tn.write(b'quit\r\n')
 
                 # 写文件
                 with open(r'/root/tengkf/phonenum/' + f'{node}.csv', 'a') as f:
-                    if len(phone_list) > 0:
-                        for phonenum in phone_list:
-                            f.write(f'{ip},{model},{phonenum}\n')
+                    if len(phone_dict) > 0:
+                        for k, v in phone_dict.items():
+                            f.write(f'{ip},{model},{k},{v}\n')
 
             # 退出登录
             self.tn.write(b'quit\r\n')
@@ -223,23 +231,26 @@ class TelnetClient():
                 self.tn.write(b' \n')
                 time.sleep(1)
                 cmd_result += self.tn.read_very_eager().decode('ascii')
-            #cmd_result = re.sub(r'--.*[\x00-\x1f]', '', cmd_result)
+            cmd_result = re.sub(
+                r'---- More \( Press \'Q\' to break \) ----', '', cmd_result)
+            cmd_result = re.sub(r'\\x1b\[37D', '', cmd_result)
             logging.warning(cmd_result)
 
-            # 号码列表
-            phone_list = []
+            # 号码字典
+            phone_dict = {}
             for line in cmd_result.split('\n'):
                 if re.search(r'sippstnuser\s+add.*telno\s+(\S+)', line):
-                    phone_list.append(
-                        re.search(r'sippstnuser\s+add.*telno\s+(\S+)', line).group(1))
+                    port, no = re.search(
+                        r'sippstnuser\s+add\s+(\S+).*telno\s+(\S+)', line).groups()
+                    phone_dict.setdefault(port, no)
 
-            logging.warning(f'当前业务号码: --->>>{phone_list}')
+            logging.warning(f'当前业务号码: --->>>{phone_dict}')
 
             # 写文件
             with open(r'/root/tengkf/phonenum/' + f'{node}.csv', 'a') as f:
-                if len(phone_list) > 0:
-                    for phonenum in phone_list:
-                        f.write(f'{ip},{model},{phonenum}\n')
+                if len(phone_dict) > 0:
+                    for k, v in phone_dict.items():
+                        f.write(f'{ip},{model},{k},{v}\n')
 
             # 退出登录
             self.tn.write(b'quit\n')

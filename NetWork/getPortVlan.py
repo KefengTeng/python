@@ -28,7 +28,7 @@ with cx_Oracle.connect('xxx', 'xxx', 'x.x.x.x:x/dbnms', encoding='UTF-8') as con
 class TelnetClient():
     def __init__(self):
         self.tn = Telnet()
-        self.tn.set_debuglevel(0)
+        self.tn.set_debuglevel(1)
 
     def deal_ZT(self, ip, model, username, password, enablepassword):
         try:
@@ -84,8 +84,63 @@ class TelnetClient():
                 self.tn.write(b'\r\n')
                 time.sleep(1)
                 cmd_result += self.tn.read_very_eager().decode('ascii')
-            cmd_result = re.sub(r'Press.*[\x00-\x1f]', '', cmd_result)
+            cmd_result = re.sub(
+                r'Press any key to continue \(Q to quit\)\\x00', '', cmd_result)
             logging.warning(cmd_result)
+
+            # 分析结果
+            vlan_dict = {}
+            if re.search(r'98', model):
+                for line in cmd_result.split('\r\n'):
+                    if re.search(r'vlan.*tag', line, re.I):
+                        vlan, slot, ports, tagging = re.search(
+                            r'vlan\s+(\d+)\s+(\d)/(\S+)\s+(.*tag)', line, re.I).groups()
+                        port_list = []
+                        for port in ports.split(','):
+                            if re.search(r'-', port):
+                                begin, end = re.search(
+                                    r'(\d+)-(\d+)', port).groups()
+                                all_port = [i for i in range(
+                                    int(begin), int(end)+1)]
+                                for tmp_port in all_port:
+                                    port_list.append(
+                                        slot + '/' + str(tmp_port))
+                            else:
+                                port_list.append(slot + '/' + port)
+                        vlan_dict.setdefault(
+                            vlan, {}).setdefault(tagging, port_list)
+            else:
+                vlan_dict = {}
+                for line in cmd_result.split('\r\n'):
+                    if re.search(r'configure vlan \d+', line, re.I):
+                        vlan = re.search(
+                            r'configure vlan (\d+)', line, re.I).group(1)
+                    if re.search(r'addport.*tag', line, re.I):
+                        slot, ports, tagging = re.search(
+                            r'addport\s+(\S+)/(\S+)\s+(.*tag)', line, re.I).groups()
+                        port_list = []
+                        for port in ports.split(','):
+                            if re.search(r'-', port):
+                                begin, end = re.search(
+                                    r'(\d+)-(\d+)', port).groups()
+                                all_port = [i for i in range(
+                                    int(begin), int(end)+1)]
+                                for tmp_port in all_port:
+                                    port_list.append(
+                                        slot + '/' + str(tmp_port))
+                            else:
+                                port_list.append(slot + '/' + port)
+                        vlan_dict.setdefault(
+                            vlan, {}).setdefault(tagging, port_list)
+            print(vlan_dict)
+
+            # 写文件
+            with open(r'/root/tengkf/phonenum/portvlan.csv', 'a') as f:
+                for ko, vo in vlan_dict.items():
+                    for ki, vi in vo.items():
+                        for port in vi:
+                            f.write(f'{ip},{model},{ko},{ki},{port}\n')
+
             # 退出登录
             self.tn.write(b'quit\r\n')
             self.tn.write(b'Y\r\n')
@@ -93,7 +148,7 @@ class TelnetClient():
         except ConnectionResetError:
             logging.warning(f'[{ip}]: Telnet连接被重置...\n')
         except:
-            logging.warning(f'[{ip}]: 建立Telnet连接失败...\n')
+            logging.warning(f'[{ip}]: 采集异常...\n')
         finally:
             self.tn.close()
 
@@ -155,8 +210,27 @@ class TelnetClient():
                 self.tn.write(b' \n')
                 time.sleep(1)
                 cmd_result += self.tn.read_very_eager().decode('ascii')
-            cmd_result = re.sub(r'--.*[\x00-\x1f]', '', cmd_result)
+            cmd_result = re.sub(
+                r'---- More \( Press \'Q\' to break \) ----', '', cmd_result)
+            cmd_result = re.sub(r'\\x1b\[37D', '', cmd_result)
             logging.warning(cmd_result)
+
+            # 分析结果
+            vlan_dict = {}
+            for line in cmd_result.split('\r\n'):
+                if re.search(r'\d+.*vlan', line, re.I):
+                    vlan, slot, port, tagging = re.search(
+                        r'(\d+)\s+[a-zA-Z]+\s+[a-zA-Z]+\s+(\S+)\s+(\S+).*vlan\s+(\S+)', line, re.I).groups()
+                    vlan_dict.setdefault(
+                        vlan, {}).setdefault(tagging, []).append(slot + port)
+            print(vlan_dict)
+
+            # 写文件
+            with open(r'/root/tengkf/phonenum/portvlan.csv', 'a') as f:
+                for ko, vo in vlan_dict.items():
+                    for ki, vi in vo.items():
+                        for port in vi:
+                            f.write(f'{ip},{model},{ko},{ki},{port}\n')
 
             # 退出登录
             self.tn.write(b'quit\n')
@@ -165,9 +239,10 @@ class TelnetClient():
         except ConnectionResetError:
             logging.warning(f'[{ip}]: Telnet连接被重置...\n')
         except:
-            logging.warning(f'[{ip}]: 建立Telnet连接失败...\n')
+            logging.warning(f'[{ip}]: 采集异常...\n')
         finally:
-            self.tn.close(
+            self.tn.close()
+
 
 for row in rows:
     Telnet_Client = TelnetClient()

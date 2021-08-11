@@ -1,8 +1,6 @@
 #!/bin/env python3
 # -*- coding: utf-8 -*-
 
-import os
-import re
 import sys
 import time
 import logging
@@ -26,9 +24,9 @@ rows = c.fetchall()
 # 关闭连接
 conn.close()
 
-hour = time.strftime('%m-%d_%H', )
+hour = time.strftime('%Y-%m-%d_%H', )
 
-# 测试
+# 连通性测试
 n = 0
 for row in rows:
     (ip, ro, rw) = row
@@ -52,7 +50,8 @@ for row in rows:
         snmpw_status = 1
     else:
         snmpw_status = 0
-    with open(r'/tmp/' + f'{hour}.txt', 'a') as f:
+
+    with open(r'/tmp/' + f'snmp_{hour}.txt', 'a') as f:
         f.write(f'{ip}\t{ping_status}\t{snmpr_status}\t{snmpw_status}\n')
 
     n += 1
